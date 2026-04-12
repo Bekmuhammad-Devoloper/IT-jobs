@@ -6,7 +6,7 @@ import BottomNav from '@/components/BottomNav';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function ProfilePage() {
-  const { user, isLoading: tgLoading } = useTelegram();
+  const { user, isLoading: tgLoading, photoUrl, tgFirstName, tgLastName } = useTelegram();
   const [profile, setProfile] = useState<any>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -33,6 +33,10 @@ export default function ProfilePage() {
 
   if (tgLoading || loading) return <LoadingSpinner />;
 
+  // Use Telegram name as primary, fallback to profile/store
+  const displayName = tgFirstName || f.firstName || user?.firstName || '';
+  const displayLastName = tgLastName || f.lastName || '';
+
   if (!user?.id) return (
     <div style={{paddingBottom:100,minHeight:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 24px',textAlign:'center'}}>
       <div className="anim-float" style={{width:72,height:72,borderRadius:24,background:'var(--navy-light)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:20}}>
@@ -48,11 +52,15 @@ export default function ProfilePage() {
     <div style={{paddingBottom:100,minHeight:'100dvh'}}>
       <div className="gradient-hero" style={{padding:'28px 20px 56px',position:'relative'}}>
         <div style={{position:'relative',zIndex:2,display:'flex',alignItems:'center',gap:16}}>
-          <div style={{width:60,height:60,borderRadius:20,display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,fontWeight:800,color:'#fff',background:'rgba(184,160,106,0.2)',border:'2px solid rgba(184,160,106,0.3)',backdropFilter:'blur(10px)',flexShrink:0}}>
-            {f.firstName?.[0] || user.firstName?.[0] || '?'}
-          </div>
+          {photoUrl ? (
+            <img src={photoUrl} alt="avatar" style={{width:60,height:60,borderRadius:20,objectFit:'cover',border:'2px solid rgba(184,160,106,0.3)',flexShrink:0}} />
+          ) : (
+            <div style={{width:60,height:60,borderRadius:20,display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,fontWeight:800,color:'#fff',background:'rgba(184,160,106,0.2)',border:'2px solid rgba(184,160,106,0.3)',backdropFilter:'blur(10px)',flexShrink:0}}>
+              {displayName?.[0] || '?'}
+            </div>
+          )}
           <div style={{flex:1}}>
-            <h1 style={{fontSize:18,fontWeight:800,color:'#fff'}}>{f.firstName || user.firstName} {f.lastName}</h1>
+            <h1 style={{fontSize:18,fontWeight:800,color:'#fff'}}>{displayName} {displayLastName}</h1>
             {f.profession && <p style={{color:'rgba(255,255,255,0.5)',fontSize:13,marginTop:2}}>{f.profession}</p>}
             {profile?.rating > 0 && <span style={{display:'inline-flex',alignItems:'center',gap:4,marginTop:4,fontSize:12,fontWeight:700,color:'var(--gold)'}}>&#9733; {profile.rating}</span>}
           </div>

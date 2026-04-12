@@ -16,6 +16,8 @@ export function useTelegram() {
     }
   }, [telegram, isAuthenticated, user, authenticate]);
 
+  const tgUser = telegram?.initDataUnsafe?.user;
+
   return {
     tg: telegram,
     user,
@@ -23,5 +25,8 @@ export function useTelegram() {
     isAuthenticated,
     colorScheme: telegram?.colorScheme || 'light',
     haptic: telegram?.HapticFeedback,
+    photoUrl: tgUser?.photo_url || null,
+    tgFirstName: tgUser?.first_name || null,
+    tgLastName: tgUser?.last_name || null,
   };
 }
