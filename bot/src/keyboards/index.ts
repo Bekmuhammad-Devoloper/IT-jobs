@@ -3,10 +3,10 @@ import { config } from '../config';
 
 export const mainKeyboard = () => {
   return new Keyboard()
-    .webApp('📱 Web App ochish', config.webAppUrl)
+    .webApp('� Web App ochish', config.webAppUrl)
     .row()
-    .text('📊 Statistika')
-    .text('ℹ️ Yordam')
+    .text('� Statistika')
+    .text('💡 Yordam')
     .row()
     .text('👤 Mening profilim')
     .resized()
@@ -14,8 +14,12 @@ export const mainKeyboard = () => {
 };
 
 export const subscribeKeyboard = () => {
+  const channelLink = config.channelUsername
+    ? `https://t.me/${config.channelUsername.replace('@', '')}`
+    : `https://t.me/c/${config.channelId.replace('-100', '')}`;
+
   return new InlineKeyboard()
-    .url('📢 Kanalga obuna bo\'lish', `https://t.me/${config.channelId.replace('@', '')}`)
+    .url('📢 Kanalga obuna bo\'lish', channelLink)
     .row()
     .text('✅ Tekshirish', 'check_subscription');
 };
@@ -23,13 +27,13 @@ export const subscribeKeyboard = () => {
 export const webAppKeyboard = () => {
   return new InlineKeyboard()
     .webApp('💼 Vakansiyalar', `${config.webAppUrl}/posts?type=VACANCY`)
-    .webApp('📄 Rezyumelar', `${config.webAppUrl}/posts?type=RESUME`)
+    .webApp('� Rezyumelar', `${config.webAppUrl}/posts?type=RESUME`)
     .row()
-    .webApp('📚 Kurslar', `${config.webAppUrl}/posts?type=COURSE`)
-    .webApp('👨‍🏫 Mentorlar', `${config.webAppUrl}/posts?type=MENTOR`)
+    .webApp('🎓 Kurslar', `${config.webAppUrl}/posts?type=COURSE`)
+    .webApp('🧑‍� Mentorlar', `${config.webAppUrl}/posts?type=MENTOR`)
     .row()
-    .webApp('🎓 Stajirovkalar', `${config.webAppUrl}/posts?type=INTERNSHIP`)
-    .webApp('🛠 Xizmatlar', `${config.webAppUrl}/services`);
+    .webApp('🚀 Stajirovkalar', `${config.webAppUrl}/posts?type=INTERNSHIP`)
+    .webApp('⚙️ Xizmatlar', `${config.webAppUrl}/services`);
 };
 
 export const adminNotifyKeyboard = (postId: number) => {
