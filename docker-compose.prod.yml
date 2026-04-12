@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: yuksalish_db
+    environment:
+      POSTGRES_DB: yuksalish
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Yuksalish2026Secure!}
+    ports:
+      - "10432:5432"
+    volumes:
+      - yuksalish_postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yuksalish_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: yuksalish_redis
+    command: redis-server --requirepass Yuksalish_Redis_2026
+    ports:
+      - "10379:6379"
+    volumes:
+      - yuksalish_redis_data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "Yuksalish_Redis_2026", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yuksalish_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: yuksalish_backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Yuksalish2026Secure!}@postgres:5432/yuksalish
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://:Yuksalish_Redis_2026@redis:6379/0
+      - JWT_SECRET=${JWT_SECRET:-Yuksalish_JWT_Secret_2026!}
+      - JWT_EXPIRATION=7d
+      - BOT_TOKEN=${BOT_TOKEN:-8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg}
+      - CHANNEL_ID=${CHANNEL_ID}
+      - CHANNEL_USERNAME=${CHANNEL_USERNAME:-@yuksalish_channel}
+      - PORT=3002
+      - NODE_ENV=production
+      - WEBAPP_URL=http://161.97.135.226:10080
+      - ADMIN_URL=http://161.97.135.226:10001
+      - SUPER_ADMIN_IDS=${SUPER_ADMIN_IDS:-123456789}
+      - ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY:-Yuksalish_Admin_Key_2026!}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-Yuksalish2026}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-20062601}
+      - VIEWS_COLLECT_CRON=0 * * * *
+      - RATING_CALC_CRON=0 0 * * *
+      - CLEANUP_CRON=0 0 * * 0
+      - POST_COOLDOWN_DAYS=15
+    ports:
+      - "10002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    networks:
+      - yuksalish_net
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: yuksalish_bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN:-8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg}
+      - CHANNEL_ID=${CHANNEL_ID}
+      - WEBAPP_URL=http://161.97.135.226:10080
+      - API_URL=http://backend:3002/api
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - backend
+      - redis
+    restart: always
+    networks:
+      - yuksalish_net
+
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:3002/api
+    container_name: yuksalish_webapp
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:3002/api
+    ports:
+      - "10000:3000"
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - yuksalish_net
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:3002/api
+    container_name: yuksalish_admin
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:3002/api
+    ports:
+      - "10001:3001"
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - yuksalish_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: yuksalish_nginx
+    ports:
+      - "10080:80"
+    volumes:
+      - ./nginx/prod.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/prod.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - webapp
+      - admin
+    restart: always
+    networks:
+      - yuksalish_net
+
+volumes:
+  yuksalish_postgres_data:
+  yuksalish_redis_data:
+
+networks:
+  yuksalish_net:
+    driver: bridge

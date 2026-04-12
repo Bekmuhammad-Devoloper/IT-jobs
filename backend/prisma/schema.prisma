@@ -1,0 +1,161 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+    USER
+    ADMIN
+    SUPERADMIN
+}
+
+enum PostType {
+    VACANCY
+    RESUME
+    COURSE
+    MENTOR
+    INTERNSHIP
+}
+
+enum PostStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    EXPIRED
+}
+
+enum ExperienceLevel {
+    JUNIOR
+    MIDDLE
+    SENIOR
+    LEAD
+}
+
+model User {
+    id                Int              @id @default(autoincrement())
+    telegramId        BigInt           @unique @map("telegram_id")
+    username          String?
+    firstName         String?          @map("first_name")
+    lastName          String?          @map("last_name")
+    phone             String?
+    age               Int?
+    city              String?
+    profession        String?
+    experience        String?
+    level             ExperienceLevel?
+    salaryExpectation String?          @map("salary_expectation")
+    technologies      String[]
+    github            String?
+    linkedin          String?
+    portfolio         String?
+    bio               String?
+    photoUrl          String?          @map("photo_url")
+    rating            Decimal          @default(0) @db.Decimal(5, 2)
+    role              UserRole         @default(USER)
+    isBlocked         Boolean          @default(false) @map("is_blocked")
+    isSubscribed      Boolean          @default(false) @map("is_subscribed")
+    profileCompleted  Boolean          @default(false) @map("profile_completed")
+    lastPostAt        DateTime?        @map("last_post_at")
+    createdAt         DateTime         @default(now()) @map("created_at")
+    updatedAt         DateTime         @updatedAt @map("updated_at")
+
+    posts Post[]
+    views PostView[]
+
+    @@map("users")
+}
+
+model Post {
+    id              Int        @id @default(autoincrement())
+    authorId        Int        @map("author_id")
+    type            PostType
+    status          PostStatus @default(PENDING)
+    title           String
+    description     String?
+    company         String?
+    city            String?
+    salary          String?
+    experience      String?
+    workType        String?    @map("work_type")
+    technologies    String[]
+    contactTelegram String?    @map("contact_telegram")
+    contactPhone    String?    @map("contact_phone")
+    contactEmail    String?    @map("contact_email")
+    link            String?
+    categoryId      Int?       @map("category_id")
+    extra           Json?
+    viewCount       Int        @default(0) @map("view_count")
+    rejectReason    String?    @map("reject_reason")
+    createdAt       DateTime   @default(now()) @map("created_at")
+    updatedAt       DateTime   @updatedAt @map("updated_at")
+
+    author   User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    category Category?  @relation(fields: [categoryId], references: [id])
+    views    PostView[]
+
+    @@map("posts")
+}
+
+model PostView {
+    id          Int      @id @default(autoincrement())
+    postId      Int      @map("post_id")
+    userId      Int?     @map("user_id")
+    fingerprint String?
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+    user User? @relation(fields: [userId], references: [id])
+
+    @@map("post_views")
+}
+
+model Category {
+    id        Int      @id @default(autoincrement())
+    name      String
+    slug      String?
+    type      String
+    order     Int      @default(0)
+    isActive  Boolean  @default(true) @map("is_active")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    posts Post[]
+
+    @@map("categories")
+}
+
+model Technology {
+    id       Int     @id @default(autoincrement())
+    name     String
+    category String?
+    isActive Boolean @default(true) @map("is_active")
+
+    @@map("technologies")
+}
+
+model Service {
+    id          Int      @id @default(autoincrement())
+    title       String
+    slug        String?
+    description String?
+    price       String?
+    icon        String?
+    link        String?
+    order       Int      @default(0)
+    isActive    Boolean  @default(true) @map("is_active")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    @@map("services")
+}
+
+model Setting {
+    key       String   @id
+    value     String
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("settings")
+}

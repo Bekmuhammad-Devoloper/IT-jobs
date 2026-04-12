@@ -1,0 +1,92 @@
+const API_URL = typeof window !== 'undefined'
+  ? '/api'  // browser: use Next.js rewrite proxy
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'); // server-side
+
+function getInitData(): string {
+  if (typeof window !== 'undefined' && window.Telegram?.WebApp?.initData) {
+    return window.Telegram.WebApp.initData;
+  }
+  return '';
+}
+
+async function request<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const initData = getInitData();
+
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(initData ? { Authorization: `tma ${initData}` } : {}),
+      ...options.headers,
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Network error' }));
+    throw new Error(error.message || `HTTP ${res.status}`);
+  }
+
+  return res.json();
+}
+
+// ── Auth ──────────────────────────────────────────────
+export const api = {
+  auth: {
+    telegram: (initData: string) =>
+      request('/auth/telegram', {
+        method: 'POST',
+        body: JSON.stringify({ initData }),
+      }),
+    me: () => request('/auth/me'),
+  },
+
+  // ── Users ──────────────────────────────────────────
+  users: {
+    getProfile: () => request('/users/me'),
+    updateProfile: (data: any) =>
+      request('/users/me', { method: 'PUT', body: JSON.stringify(data) }),
+    getResumes: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request(`/users/resumes${qs}`);
+    },
+    getResume: (id: number) => request(`/users/resumes/${id}`),
+  },
+
+  // ── Posts ──────────────────────────────────────────
+  posts: {
+    getAll: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request(`/posts${qs}`);
+    },
+    getOne: (id: number) => request(`/posts/${id}`),
+    create: (data: any) =>
+      request('/posts', { method: 'POST', body: JSON.stringify(data) }),
+    getMy: (page = 1) => request(`/posts/my?page=${page}`),
+    addView: (id: number, fingerprint?: string) =>
+      request(`/posts/${id}/view`, {
+        method: 'POST',
+        body: JSON.stringify({ fingerprint }),
+      }),
+    delete: (id: number) => request(`/posts/${id}`, { method: 'DELETE' }),
+  },
+
+  // ── Services ──────────────────────────────────────
+  services: {
+    getAll: () => request('/services'),
+    getOne: (id: number) => request(`/services/${id}`),
+  },
+
+  // ── Statistics ──────────────────────────────────────
+  statistics: {
+    getPublic: () => request('/statistics'),
+  },
+
+  // ── Telegram ──────────────────────────────────────
+  telegram: {
+    checkSubscription: (telegramId: string) =>
+      request(`/telegram/check-subscription/${telegramId}`),
+  },
+};
