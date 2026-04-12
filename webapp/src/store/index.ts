@@ -23,15 +23,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   error: null,
 
   initTelegram: () => {
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.ready();
-      tg.expand();
-      set({ telegram: tg });
-    } else {
-      // Not inside Telegram — skip auth, just stop loading
-      set({ isLoading: false });
-    }
+    const tryInit = (attempt = 0) => {
+      if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        set({ telegram: tg });
+      } else if (attempt < 20) {
+        // Script may still be loading — retry every 100ms, up to 2 seconds
+        setTimeout(() => tryInit(attempt + 1), 100);
+      } else {
+        // Not inside Telegram after retries — stop loading
+        set({ isLoading: false });
+      }
+    };
+    tryInit();
   },
 
   authenticate: async () => {
