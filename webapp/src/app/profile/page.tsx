@@ -31,7 +31,10 @@ export default function ProfilePage() {
     finally { setSaving(false); }
   }
 
-  if (tgLoading || loading) return <LoadingSpinner />;
+  // While Telegram auth is in progress, show loading
+  if (tgLoading) return <LoadingSpinner />;
+  // While fetching profile data from API
+  if (user?.id && loading) return <LoadingSpinner />;
 
   // Use Telegram name as primary, fallback to profile/store
   const displayName = tgFirstName || f.firstName || user?.firstName || '';
