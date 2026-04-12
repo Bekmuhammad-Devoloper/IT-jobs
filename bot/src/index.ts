@@ -12,16 +12,16 @@ async function main() {
     console.error('Bot error:', err);
   });
 
-  // Global subscription check — every message/callback must pass
+  // Global subscription check
   bot.use(subscriptionGuard);
 
   // Commands
   bot.command('start', handleStart);
   bot.command('help', handleHelp);
 
-  // Text handlers
-  bot.hears('� Statistika', handleStats);
-  bot.hears('💡 Yordam', handleHelp);
+  // Text handlers (must match keyboard button text exactly)
+  bot.hears('📊 Statistika', handleStats);
+  bot.hears('ℹ️ Yordam', handleHelp);
   bot.hears('👤 Mening profilim', handleProfile);
 
   // Callback queries
@@ -33,7 +33,7 @@ async function main() {
     { command: 'help', description: 'Yordam' },
   ]);
 
-  // Set Menu button → "Yuksalish.dev" web app
+  // Set Menu button text to "Yuksalish.dev"
   await bot.api.setChatMenuButton({
     menu_button: {
       type: 'web_app',
@@ -42,7 +42,7 @@ async function main() {
     },
   });
 
-  console.log('🤖 Yuksalish.dev Bot is starting...');
+  console.log('🚀 Yuksalish.dev Bot is starting...');
   await bot.start();
 }
 

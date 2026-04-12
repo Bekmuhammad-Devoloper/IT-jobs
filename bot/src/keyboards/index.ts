@@ -3,10 +3,10 @@ import { config } from '../config';
 
 export const mainKeyboard = () => {
   return new Keyboard()
-    .webApp('� Web App ochish', config.webAppUrl)
+    .webApp('💻 Yuksalish.dev', config.webAppUrl)
     .row()
-    .text('� Statistika')
-    .text('💡 Yordam')
+    .text('📊 Statistika')
+    .text('ℹ️ Yordam')
     .row()
     .text('👤 Mening profilim')
     .resized()
@@ -27,12 +27,12 @@ export const subscribeKeyboard = () => {
 export const webAppKeyboard = () => {
   return new InlineKeyboard()
     .webApp('💼 Vakansiyalar', `${config.webAppUrl}/posts?type=VACANCY`)
-    .webApp('� Rezyumelar', `${config.webAppUrl}/posts?type=RESUME`)
+    .webApp('📋 Rezyumelar', `${config.webAppUrl}/posts?type=RESUME`)
     .row()
-    .webApp('🎓 Kurslar', `${config.webAppUrl}/posts?type=COURSE`)
-    .webApp('🧑‍� Mentorlar', `${config.webAppUrl}/posts?type=MENTOR`)
+    .webApp('📚 Kurslar', `${config.webAppUrl}/posts?type=COURSE`)
+    .webApp('🧑‍💻 Mentorlar', `${config.webAppUrl}/posts?type=MENTOR`)
     .row()
-    .webApp('🚀 Stajirovkalar', `${config.webAppUrl}/posts?type=INTERNSHIP`)
+    .webApp('🎓 Stajirovkalar', `${config.webAppUrl}/posts?type=INTERNSHIP`)
     .webApp('⚙️ Xizmatlar', `${config.webAppUrl}/services`);
 };
 
