@@ -16,9 +16,9 @@ export default function AdminRootPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-4xl mb-4">⏳</div>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:'2.25rem',marginBottom:'1rem'}}>⏳</div>
         <p>Yuklanmoqda...</p>
       </div>
     </div>
