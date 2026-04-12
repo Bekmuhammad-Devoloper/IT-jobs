@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 
 interface AdminStats {
@@ -188,7 +189,7 @@ export default function DashboardPage() {
           <h2>Tezkor amallar</h2>
         </div>
         <div className="quick-actions">
-          <a href="/dashboard/moderation" className="quick-action">
+          <Link href="/dashboard/moderation" className="quick-action">
             <div className="quick-action-icon icon-box-green">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#16a34a" strokeWidth="1.8" fill="rgba(22,163,74,0.08)"/>
@@ -196,8 +197,8 @@ export default function DashboardPage() {
               </svg>
             </div>
             <span>Moderatsiya</span>
-          </a>
-          <a href="/dashboard/posts" className="quick-action">
+          </Link>
+          <Link href="/dashboard/posts" className="quick-action">
             <div className="quick-action-icon icon-box-blue">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="18" height="18" rx="3" stroke="#2563eb" strokeWidth="1.8" fill="rgba(37,99,235,0.06)"/>
@@ -205,8 +206,8 @@ export default function DashboardPage() {
               </svg>
             </div>
             <span>E&apos;lonlar</span>
-          </a>
-          <a href="/dashboard/users" className="quick-action">
+          </Link>
+          <Link href="/dashboard/users" className="quick-action">
             <div className="quick-action-icon icon-box-orange">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <circle cx="9" cy="7" r="3.5" stroke="#ea580c" strokeWidth="1.8" fill="rgba(234,88,12,0.08)"/>
@@ -215,8 +216,8 @@ export default function DashboardPage() {
               </svg>
             </div>
             <span>Foydalanuvchilar</span>
-          </a>
-          <a href="/dashboard/settings" className="quick-action">
+          </Link>
+          <Link href="/dashboard/settings" className="quick-action">
             <div className="quick-action-icon icon-box-gold-light">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="3" stroke="#b8a06a" strokeWidth="1.8" fill="rgba(184,160,106,0.1)"/>
@@ -224,7 +225,7 @@ export default function DashboardPage() {
               </svg>
             </div>
             <span>Sozlamalar</span>
-          </a>
+          </Link>
         </div>
       </div>
 
