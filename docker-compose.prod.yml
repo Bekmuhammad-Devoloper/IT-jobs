@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:17-alpine
@@ -7,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: yuksalish
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-Yuksalish2026Secure!}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Yuksalish2026Secure}
     ports:
       - "10432:5432"
     volumes:
@@ -24,14 +22,14 @@ services:
   redis:
     image: redis:7-alpine
     container_name: yuksalish_redis
-    command: redis-server --requirepass Yuksalish_Redis_2026
+    command: redis-server --requirepass YuksalishRedis2026
     ports:
       - "10379:6379"
     volumes:
       - yuksalish_redis_data:/data
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "Yuksalish_Redis_2026", "ping"]
+      test: ["CMD", "redis-cli", "-a", "YuksalishRedis2026", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,21 +42,21 @@ services:
       dockerfile: Dockerfile
     container_name: yuksalish_backend
     environment:
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Yuksalish2026Secure!}@postgres:5432/yuksalish
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Yuksalish2026Secure}@postgres:5432/yuksalish
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_URL=redis://:Yuksalish_Redis_2026@redis:6379/0
-      - JWT_SECRET=${JWT_SECRET:-Yuksalish_JWT_Secret_2026!}
+      - REDIS_URL=redis://:YuksalishRedis2026@redis:6379/0
+      - JWT_SECRET=${JWT_SECRET:-YuksalishJWTSecret2026}
       - JWT_EXPIRATION=7d
       - BOT_TOKEN=${BOT_TOKEN:-8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg}
       - CHANNEL_ID=${CHANNEL_ID}
       - CHANNEL_USERNAME=${CHANNEL_USERNAME:-@yuksalish_channel}
       - PORT=3002
       - NODE_ENV=production
-      - WEBAPP_URL=http://161.97.135.226:10080
-      - ADMIN_URL=http://161.97.135.226:10001
+      - WEBAPP_URL=https://it-jobs.bekmuhammad.uz
+      - ADMIN_URL=https://it-jobs.bekmuhammad.uz:10001
       - SUPER_ADMIN_IDS=${SUPER_ADMIN_IDS:-123456789}
-      - ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY:-Yuksalish_Admin_Key_2026!}
+      - ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY:-YuksalishAdminKey2026}
       - ADMIN_USERNAME=${ADMIN_USERNAME:-Yuksalish2026}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-20062601}
       - VIEWS_COLLECT_CRON=0 * * * *
@@ -84,7 +82,7 @@ services:
     environment:
       - BOT_TOKEN=${BOT_TOKEN:-8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg}
       - CHANNEL_ID=${CHANNEL_ID}
-      - WEBAPP_URL=http://161.97.135.226:10080
+      - WEBAPP_URL=https://it-jobs.bekmuhammad.uz
       - API_URL=http://backend:3002/api
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -146,6 +144,8 @@ services:
     restart: always
     networks:
       - yuksalish_net
+    profiles:
+      - standalone
 
 volumes:
   yuksalish_postgres_data:
