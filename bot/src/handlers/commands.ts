@@ -51,7 +51,7 @@ export async function handleHelp(ctx: Context) {
 export async function handleStats(ctx: Context) {
   try {
     const response = await fetch(`${config.apiUrl}/statistics`);
-    const stats = await response.json();
+    const stats: any = await response.json();
     const d = stats.data || stats;
 
     await ctx.reply(
