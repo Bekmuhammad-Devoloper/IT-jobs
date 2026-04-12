@@ -45,6 +45,7 @@ services:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Yuksalish2026Secure}@postgres:5432/yuksalish
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=YuksalishRedis2026
       - REDIS_URL=redis://:YuksalishRedis2026@redis:6379/0
       - JWT_SECRET=${JWT_SECRET:-YuksalishJWTSecret2026}
       - JWT_EXPIRATION=7d
