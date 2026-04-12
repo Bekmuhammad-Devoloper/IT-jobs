@@ -16,7 +16,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (tgLoading) return;
     if (!user?.id) { setLoading(false); return; }
-    api.users.getByTelegramId(user.id).then((r: any) => {
+    api.users.getProfile().then((r: any) => {
       const p = r.data || r; setProfile(p);
       setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||''});
     }).catch(console.error).finally(() => setLoading(false));
@@ -27,7 +27,7 @@ export default function ProfilePage() {
   async function save() {
     if (!profile?.id) return;
     setSaving(true);
-    try { await api.users.update(profile.id, f); setEditing(false); } catch(e) { alert('Xatolik'); }
+    try { await api.users.updateProfile(f); setEditing(false); } catch(e) { alert('Xatolik'); }
     finally { setSaving(false); }
   }
 
