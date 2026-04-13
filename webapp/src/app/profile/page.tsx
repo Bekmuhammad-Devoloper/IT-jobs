@@ -82,19 +82,19 @@ export default function ProfilePage() {
               Profilni tahrirlash
             </h2>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-              <PF label="Ism" value={f.firstName} onChange={v=>set('firstName',v)} />
-              <PF label="Familiya" value={f.lastName} onChange={v=>set('lastName',v)} />
+              <PF label="Ism" value={f.firstName} onChange={v=>setField('firstName',v)} />
+              <PF label="Familiya" value={f.lastName} onChange={v=>setField('lastName',v)} />
             </div>
-            <PF label="Kasb" value={f.profession} onChange={v=>set('profession',v)} placeholder="Frontend Developer" />
-            <PF label="Bio" value={f.bio} onChange={v=>set('bio',v)} placeholder="Qisqacha o'zingiz haqida..." textarea />
-            <PF label="Ko'nikmalar" value={f.skills} onChange={v=>set('skills',v)} placeholder="React, TypeScript" />
-            <PF label="Shahar" value={f.city} onChange={v=>set('city',v)} placeholder="Toshkent" />
+            <PF label="Kasb" value={f.profession} onChange={v=>setField('profession',v)} placeholder="Frontend Developer" />
+            <PF label="Bio" value={f.bio} onChange={v=>setField('bio',v)} placeholder="Qisqacha o'zingiz haqida..." textarea />
+            <PF label="Ko'nikmalar" value={f.skills} onChange={v=>setField('skills',v)} placeholder="React, TypeScript" />
+            <PF label="Shahar" value={f.city} onChange={v=>setField('city',v)} placeholder="Toshkent" />
             <div className="divider" />
             <h3 style={{fontWeight:800,fontSize:14,color:'var(--navy)'}}>Ijtimoiy tarmoqlar</h3>
-            <PF label="GitHub" value={f.github} onChange={v=>set('github',v)} />
-            <PF label="LinkedIn" value={f.linkedin} onChange={v=>set('linkedin',v)} />
-            <PF label="Portfolio" value={f.portfolio} onChange={v=>set('portfolio',v)} />
-            <PF label="Telefon" value={f.contactPhone} onChange={v=>set('contactPhone',v)} placeholder="+998..." />
+            <PF label="GitHub" value={f.github} onChange={v=>setField('github',v)} />
+            <PF label="LinkedIn" value={f.linkedin} onChange={v=>setField('linkedin',v)} />
+            <PF label="Portfolio" value={f.portfolio} onChange={v=>setField('portfolio',v)} />
+            <PF label="Telefon" value={f.contactPhone} onChange={v=>setField('contactPhone',v)} placeholder="+998..." />
             <button className="btn btn-primary" style={{width:'100%'}} onClick={save} disabled={saving}>{saving?'Saqlanmoqda...':'Saqlash'}</button>
           </div>
         ) : (
