@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAppStore } from '@/store';
 import { api } from '@/lib/api';
 import BottomNav from '@/components/BottomNav';
@@ -13,27 +13,53 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [f, setF] = useState({firstName:'',lastName:'',profession:'',bio:'',skills:'',city:'',github:'',linkedin:'',portfolio:'',contactPhone:''});
 
-  // Get Telegram user data directly from window (always available in Telegram WebApp)
-  const tgUser = typeof window !== 'undefined' ? window.Telegram?.WebApp?.initDataUnsafe?.user : null;
-  const photoUrl = tgUser?.photo_url || null;
-  const tgFirstName = tgUser?.first_name || null;
-  const tgLastName = tgUser?.last_name || null;
+  // Telegram user data via state (not render-time read, to handle SDK load timing)
+  const [tgPhotoUrl, setTgPhotoUrl] = useState<string|null>(null);
+  const [tgFirstName, setTgFirstName] = useState<string|null>(null);
+  const [tgLastName, setTgLastName] = useState<string|null>(null);
+  const [tgUsername, setTgUsername] = useState<string|null>(null);
 
+  // Read Telegram user data - retry until SDK loads
   useEffect(() => {
-    // If authenticated and have user, fetch profile
+    let cancelled = false;
+    const readTg = (attempt = 0) => {
+      if (cancelled) return;
+      const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      if (u) {
+        setTgFirstName(u.first_name || null);
+        setTgLastName(u.last_name || null);
+        setTgPhotoUrl(u.photo_url || null);
+        setTgUsername(u.username || null);
+      } else if (attempt < 30) {
+        setTimeout(() => readTg(attempt + 1), 100);
+      }
+    };
+    readTg();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Fetch profile when user is authenticated from store
+  useEffect(() => {
     if (user?.id) {
       api.users.getProfile().then((r: any) => {
         const p = r.data || r; setProfile(p);
         setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||''});
       }).catch(console.error).finally(() => setLoading(false));
     } else if (!storeLoading) {
-      // Store finished loading but no user — use Telegram data directly
       setLoading(false);
-      if (tgFirstName) {
-        setF(prev => ({ ...prev, firstName: tgFirstName || '', lastName: tgLastName || '' }));
-      }
     }
-  }, [user, storeLoading, tgFirstName, tgLastName]);
+  }, [user, storeLoading]);
+
+  // When Telegram data arrives and we don't have profile data yet, prefill names
+  useEffect(() => {
+    if (tgFirstName && !profile) {
+      setF(prev => ({
+        ...prev,
+        firstName: prev.firstName || tgFirstName || '',
+        lastName: prev.lastName || tgLastName || '',
+      }));
+    }
+  }, [tgFirstName, tgLastName, profile]);
 
   const setField = (k:string,v:string) => setF(p=>({...p,[k]:v}));
 
@@ -46,9 +72,10 @@ export default function ProfilePage() {
   // Show loading only briefly while store initializes
   if (storeLoading && loading) return <LoadingSpinner />;
 
-  // Use Telegram name as primary, fallback to profile data
-  const displayName = tgFirstName || f.firstName || user?.firstName || 'Foydalanuvchi';
-  const displayLastName = tgLastName || f.lastName || '';
+  // Priority: store user > Telegram data > form data > fallback
+  const displayName = user?.firstName || tgFirstName || f.firstName || 'Foydalanuvchi';
+  const displayLastName = user?.lastName || tgLastName || f.lastName || '';
+  const photoUrl = tgPhotoUrl;
 
   return (
     <div style={{paddingBottom:100,minHeight:'100dvh'}}>
