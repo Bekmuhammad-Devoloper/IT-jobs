@@ -42,8 +42,34 @@ export const useAppStore = create<AppState>((set, get) => ({
         tg.ready();
         tg.expand();
         set({ telegram: tg });
-        // Immediately authenticate after getting Telegram context
-        get().authenticate();
+        // Authenticate with initData directly (don't rely on get().telegram)
+        const initData = tg.initData;
+        if (initData) {
+          console.log('[Yuksalish] Calling authenticate with initData length:', initData.length);
+          (async () => {
+            try {
+              set({ isLoading: true, error: null });
+              console.log('[Yuksalish] Sending POST /api/auth/telegram...');
+              const result: any = await api.auth.telegram(initData);
+              console.log('[Yuksalish] Auth response:', JSON.stringify(result).substring(0, 200));
+              const user = result.data?.user || result.user;
+              const token = result.data?.token || result.token;
+              if (token) {
+                localStorage.setItem('token', token);
+              }
+              console.log('[Yuksalish] Auth success, user:', user?.firstName);
+              set({ user, isAuthenticated: true });
+            } catch (error: any) {
+              console.error('[Yuksalish] Auth error:', error.message);
+              set({ error: error.message });
+            } finally {
+              set({ isLoading: false });
+            }
+          })();
+        } else {
+          console.log('[Yuksalish] No initData, skipping auth');
+          set({ isLoading: false });
+        }
       } else if (attempt < 50) {
         // Script may still be loading — retry every 100ms, up to ~5 seconds
         setTimeout(() => tryInit(attempt + 1), 100);
