@@ -8,6 +8,7 @@ interface AppState {
   isLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;
+  _initDone: boolean;
 
   initTelegram: () => void;
   authenticate: () => Promise<void>;
@@ -15,34 +16,40 @@ interface AppState {
   setError: (error: string | null) => void;
 }
 
-let initStarted = false;
-
 export const useAppStore = create<AppState>((set, get) => ({
   user: null,
   telegram: null,
   isLoading: true,
   isAuthenticated: false,
   error: null,
+  _initDone: false,
 
   initTelegram: () => {
-    // Prevent double init from React StrictMode
-    if (initStarted) return;
-    initStarted = true;
+    // Prevent double init
+    if (get()._initDone) return;
+    set({ _initDone: true });
+
+    console.log('[Yuksalish] initTelegram called');
 
     const tryInit = (attempt = 0) => {
-      if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-        const tg = window.Telegram.WebApp;
+      const tgAvailable = typeof window !== 'undefined' && window.Telegram?.WebApp;
+      console.log(`[Yuksalish] tryInit attempt=${attempt}, tgAvailable=${!!tgAvailable}`);
+
+      if (tgAvailable) {
+        const tg = window.Telegram!.WebApp;
+        console.log('[Yuksalish] Telegram WebApp found, initData length:', tg.initData?.length);
+        console.log('[Yuksalish] initDataUnsafe user:', JSON.stringify(tg.initDataUnsafe?.user));
         tg.ready();
         tg.expand();
         set({ telegram: tg });
         // Immediately authenticate after getting Telegram context
         get().authenticate();
-      } else if (attempt < 30) {
-        // Script may still be loading — retry every 150ms, up to ~4.5 seconds
-        setTimeout(() => tryInit(attempt + 1), 150);
+      } else if (attempt < 50) {
+        // Script may still be loading — retry every 100ms, up to ~5 seconds
+        setTimeout(() => tryInit(attempt + 1), 100);
       } else {
         // Not inside Telegram after retries — stop loading
-        console.log('[Yuksalish] Not in Telegram context');
+        console.log('[Yuksalish] Not in Telegram context after 50 attempts');
         set({ isLoading: false });
       }
     };
@@ -55,12 +62,12 @@ export const useAppStore = create<AppState>((set, get) => ({
       const tg = get().telegram;
 
       if (!tg?.initData) {
-        console.log('[Yuksalish] No initData available');
+        console.log('[Yuksalish] No initData available, skipping auth');
         set({ isLoading: false });
         return;
       }
 
-      console.log('[Yuksalish] Authenticating with initData...');
+      console.log('[Yuksalish] Authenticating with initData (length:', tg.initData.length, ')...');
       const result: any = await api.auth.telegram(tg.initData);
       const user = result.data?.user || result.user;
       const token = result.data?.token || result.token;

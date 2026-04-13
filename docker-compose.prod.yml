@@ -50,8 +50,8 @@ services:
       - JWT_SECRET=${JWT_SECRET:-YuksalishJWTSecret2026}
       - JWT_EXPIRATION=7d
       - BOT_TOKEN=${BOT_TOKEN:-8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg}
-      - CHANNEL_ID=${CHANNEL_ID}
-      - CHANNEL_USERNAME=${CHANNEL_USERNAME:-@yuksalish_channel}
+      - CHANNEL_ID=${CHANNEL_ID:-"-1003994247770"}
+      - CHANNEL_USERNAME=${CHANNEL_USERNAME:-@Yuksalishdev_ITjobs}
       - PORT=3002
       - NODE_ENV=production
       - WEBAPP_URL=https://it-jobs.bekmuhammad.uz
@@ -82,7 +82,8 @@ services:
     container_name: yuksalish_bot
     environment:
       - BOT_TOKEN=${BOT_TOKEN:-8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg}
-      - CHANNEL_ID=${CHANNEL_ID}
+      - CHANNEL_ID=${CHANNEL_ID:-"-1003994247770"}
+      - CHANNEL_USERNAME=${CHANNEL_USERNAME:-@Yuksalishdev_ITjobs}
       - WEBAPP_URL=https://it-jobs.bekmuhammad.uz
       - API_URL=http://backend:3002/api
       - REDIS_HOST=redis
