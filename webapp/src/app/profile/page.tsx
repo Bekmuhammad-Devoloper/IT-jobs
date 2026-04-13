@@ -1,28 +1,41 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useTelegram } from '@/hooks/useTelegram';
+import { useAppStore } from '@/store';
 import { api } from '@/lib/api';
 import BottomNav from '@/components/BottomNav';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function ProfilePage() {
-  const { user, isLoading: tgLoading, photoUrl, tgFirstName, tgLastName } = useTelegram();
+  const { user, telegram, isLoading: storeLoading, isAuthenticated } = useAppStore();
   const [profile, setProfile] = useState<any>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [f, setF] = useState({firstName:'',lastName:'',profession:'',bio:'',skills:'',city:'',github:'',linkedin:'',portfolio:'',contactPhone:''});
 
-  useEffect(() => {
-    if (tgLoading) return;
-    if (!user?.id) { setLoading(false); return; }
-    api.users.getProfile().then((r: any) => {
-      const p = r.data || r; setProfile(p);
-      setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||''});
-    }).catch(console.error).finally(() => setLoading(false));
-  }, [tgLoading, user]);
+  // Get Telegram user data directly from window (always available in Telegram WebApp)
+  const tgUser = typeof window !== 'undefined' ? window.Telegram?.WebApp?.initDataUnsafe?.user : null;
+  const photoUrl = tgUser?.photo_url || null;
+  const tgFirstName = tgUser?.first_name || null;
+  const tgLastName = tgUser?.last_name || null;
 
-  const set = (k:string,v:string) => setF(p=>({...p,[k]:v}));
+  useEffect(() => {
+    // If authenticated and have user, fetch profile
+    if (user?.id) {
+      api.users.getProfile().then((r: any) => {
+        const p = r.data || r; setProfile(p);
+        setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||''});
+      }).catch(console.error).finally(() => setLoading(false));
+    } else if (!storeLoading) {
+      // Store finished loading but no user — use Telegram data directly
+      setLoading(false);
+      if (tgFirstName) {
+        setF(prev => ({ ...prev, firstName: tgFirstName || '', lastName: tgLastName || '' }));
+      }
+    }
+  }, [user, storeLoading, tgFirstName, tgLastName]);
+
+  const setField = (k:string,v:string) => setF(p=>({...p,[k]:v}));
 
   async function save() {
     setSaving(true);
@@ -30,11 +43,10 @@ export default function ProfilePage() {
     finally { setSaving(false); }
   }
 
-  // Show loading only briefly while Telegram initializes
-  if (tgLoading && !profile) return <LoadingSpinner />;
-  if (user?.id && loading) return <LoadingSpinner />;
+  // Show loading only briefly while store initializes
+  if (storeLoading && loading) return <LoadingSpinner />;
 
-  // Use Telegram name as primary, fallback to profile/store
+  // Use Telegram name as primary, fallback to profile data
   const displayName = tgFirstName || f.firstName || user?.firstName || 'Foydalanuvchi';
   const displayLastName = tgLastName || f.lastName || '';
 
@@ -54,9 +66,11 @@ export default function ProfilePage() {
             {f.profession && <p style={{color:'rgba(255,255,255,0.5)',fontSize:13,marginTop:2}}>{f.profession}</p>}
             {profile?.rating > 0 && <span style={{display:'inline-flex',alignItems:'center',gap:4,marginTop:4,fontSize:12,fontWeight:700,color:'var(--gold)'}}>&#9733; {profile.rating}</span>}
           </div>
-          <button onClick={() => setEditing(!editing)} style={{width:36,height:36,borderRadius:10,background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
-            <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d={editing?"M6 18L18 6M6 6l12 12":"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"}/></svg>
-          </button>
+          {user?.id && (
+            <button onClick={() => setEditing(!editing)} style={{width:36,height:36,borderRadius:10,background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+              <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d={editing?"M6 18L18 6M6 6l12 12":"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"}/></svg>
+            </button>
+          )}
         </div>
       </div>
 
