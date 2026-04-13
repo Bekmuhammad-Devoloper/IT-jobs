@@ -25,31 +25,18 @@ export default function ProfilePage() {
   const set = (k:string,v:string) => setF(p=>({...p,[k]:v}));
 
   async function save() {
-    if (!profile?.id) return;
     setSaving(true);
     try { await api.users.updateProfile(f); setEditing(false); } catch(e) { alert('Xatolik'); }
     finally { setSaving(false); }
   }
 
-  // While Telegram auth is in progress, show loading
-  if (tgLoading) return <LoadingSpinner />;
-  // While fetching profile data from API
+  // Show loading only briefly while Telegram initializes
+  if (tgLoading && !profile) return <LoadingSpinner />;
   if (user?.id && loading) return <LoadingSpinner />;
 
   // Use Telegram name as primary, fallback to profile/store
-  const displayName = tgFirstName || f.firstName || user?.firstName || '';
+  const displayName = tgFirstName || f.firstName || user?.firstName || 'Foydalanuvchi';
   const displayLastName = tgLastName || f.lastName || '';
-
-  if (!user?.id) return (
-    <div style={{paddingBottom:100,minHeight:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 24px',textAlign:'center'}}>
-      <div className="anim-float" style={{width:72,height:72,borderRadius:24,background:'var(--navy-light)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:20}}>
-        <svg width="28" height="28" fill="none" stroke="var(--navy)" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      </div>
-      <h2 style={{fontWeight:800,fontSize:18,marginBottom:8,color:'var(--navy)'}}>Profil faqat Telegram orqali</h2>
-      <p style={{fontSize:14,color:'var(--text-muted)',maxWidth:260,lineHeight:1.5}}>Ilovani Telegram bot orqali oching</p>
-      <BottomNav />
-    </div>
-  );
 
   return (
     <div style={{paddingBottom:100,minHeight:'100dvh'}}>
