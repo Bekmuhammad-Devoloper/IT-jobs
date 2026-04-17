@@ -42,9 +42,16 @@ export default function AdminUsersPage() {
       if (search) params.q = search;
 
       const res: any = await adminApi.users.getAll(params);
-      const data = res.data || res;
-      setUsers(data.data || []);
-      setTotalPages(data.meta?.totalPages || 1);
+      if (Array.isArray(res.data)) {
+        setUsers(res.data);
+        setTotalPages(res.meta?.totalPages || 1);
+      } else if (res.data?.data) {
+        setUsers(res.data.data);
+        setTotalPages(res.data.meta?.totalPages || 1);
+      } else {
+        setUsers([]);
+        setTotalPages(1);
+      }
     } catch (e) {
       console.error(e);
     } finally {

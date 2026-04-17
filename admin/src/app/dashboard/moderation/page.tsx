@@ -36,9 +36,16 @@ export default function ModerationPage() {
     try {
       setLoading(true);
       const res: any = await adminApi.moderation.getPending(page);
-      const data = res.data || res;
-      setPosts(data.data || []);
-      setTotalPages(data.meta?.totalPages || 1);
+      if (Array.isArray(res.data)) {
+        setPosts(res.data);
+        setTotalPages(res.meta?.totalPages || 1);
+      } else if (res.data?.data) {
+        setPosts(res.data.data);
+        setTotalPages(res.data.meta?.totalPages || 1);
+      } else {
+        setPosts([]);
+        setTotalPages(1);
+      }
     } catch (e) {
       console.error(e);
     } finally {
