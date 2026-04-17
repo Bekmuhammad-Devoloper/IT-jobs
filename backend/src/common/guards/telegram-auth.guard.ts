@@ -18,7 +18,7 @@ export class TelegramAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization header missing');
     }
 
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace(/^(Bearer |tma )/i, '');
 
     try {
       const initData = new URLSearchParams(token);
