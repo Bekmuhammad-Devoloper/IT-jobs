@@ -54,6 +54,7 @@ model User {
     portfolio         String?
     bio               String?
     photoUrl          String?          @map("photo_url")
+    resumeUrl         String?          @map("resume_url")
     rating            Decimal          @default(0) @db.Decimal(5, 2)
     role              UserRole         @default(USER)
     isBlocked         Boolean          @default(false) @map("is_blocked")

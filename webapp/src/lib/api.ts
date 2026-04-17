@@ -55,6 +55,25 @@ export const api = {
     getResume: (id: number) => request(`/users/resumes/${id}`),
   },
 
+  // ── Upload ──────────────────────────────────────────
+  upload: {
+    file: async (file: File): Promise<{ url: string; filename: string; originalName: string; size: number }> => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const initData = getInitData();
+      const res = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        headers: initData ? { Authorization: `tma ${initData}` } : {},
+        body: formData,
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ message: 'Upload error' }));
+        throw new Error(error.message || `HTTP ${res.status}`);
+      }
+      return res.json();
+    },
+  },
+
   // ── Posts ──────────────────────────────────────────
   posts: {
     getAll: (params?: Record<string, string>) => {

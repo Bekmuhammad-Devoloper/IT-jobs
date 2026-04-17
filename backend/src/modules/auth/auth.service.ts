@@ -45,9 +45,20 @@ export class AuthService {
           username: userData.username || null,
           firstName: userData.first_name || null,
           lastName: userData.last_name || null,
+          photoUrl: userData.photo_url || null,
         },
       });
       this.logger.log(`New user created: ${userData.id}`);
+    } else {
+      // Update photo and username on each login
+      const updateData: any = {};
+      if (userData.photo_url && userData.photo_url !== user.photoUrl) updateData.photoUrl = userData.photo_url;
+      if (userData.username && userData.username !== user.username) updateData.username = userData.username;
+      if (userData.first_name && userData.first_name !== user.firstName) updateData.firstName = userData.first_name;
+      if (userData.last_name !== undefined && userData.last_name !== user.lastName) updateData.lastName = userData.last_name || null;
+      if (Object.keys(updateData).length > 0) {
+        user = await this.prisma.user.update({ where: { id: user.id }, data: updateData });
+      }
     }
 
     const token = this.jwtService.sign({

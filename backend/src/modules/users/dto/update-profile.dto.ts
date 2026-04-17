@@ -17,4 +17,5 @@ export class UpdateProfileDto {
   @ApiPropertyOptional() @IsOptional() @IsString() github?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() linkedin?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() salaryExpectation?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() resumeUrl?: string;
 }

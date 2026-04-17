@@ -66,6 +66,8 @@ services:
       - POST_COOLDOWN_DAYS=15
     ports:
       - "10002:3002"
+    volumes:
+      - yuksalish_uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -152,6 +154,7 @@ services:
 volumes:
   yuksalish_postgres_data:
   yuksalish_redis_data:
+  yuksalish_uploads:
 
 networks:
   yuksalish_net:

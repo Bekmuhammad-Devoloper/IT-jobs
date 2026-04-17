@@ -15,6 +15,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { TelegramModule } from './modules/telegram/telegram.module';
 import { RatingModule } from './modules/rating/rating.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
     TelegramModule,
     RatingModule,
     TasksModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

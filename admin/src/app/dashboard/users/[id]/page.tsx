@@ -20,6 +20,7 @@ interface UserDetail {
   github?: string;
   linkedin?: string;
   portfolio?: string;
+  resumeUrl?: string;
   technologies?: string[];
   role: string;
   isBlocked: boolean;
@@ -121,6 +122,7 @@ export default function UserDetailPage() {
             <InfoRow label="GitHub" value={user.github || '-'} isLink={!!user.github} />
             <InfoRow label="LinkedIn" value={user.linkedin || '-'} isLink={!!user.linkedin} />
             <InfoRow label="Portfolio" value={user.portfolio || '-'} isLink={!!user.portfolio} />
+            <InfoRow label="Rezyume" value={user.resumeUrl ? 'Yuklangan ✓' : '-'} isLink={!!user.resumeUrl} />
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [f, setF] = useState({firstName:'',lastName:'',profession:'',bio:'',skills:'',city:'',github:'',linkedin:'',portfolio:'',contactPhone:''});
+  const [f, setF] = useState({firstName:'',lastName:'',profession:'',bio:'',skills:'',city:'',github:'',linkedin:'',portfolio:'',contactPhone:'',resumeUrl:''});
 
   // Telegram user data via state (not render-time read, to handle SDK load timing)
   const [tgPhotoUrl, setTgPhotoUrl] = useState<string|null>(null);
@@ -43,7 +43,7 @@ export default function ProfilePage() {
     if (user?.id) {
       api.users.getProfile().then((r: any) => {
         const p = r.data || r; setProfile(p);
-        setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||''});
+        setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||'',resumeUrl:p.resumeUrl||''});
       }).catch(console.error).finally(() => setLoading(false));
     } else if (!storeLoading) {
       setLoading(false);
@@ -122,6 +122,11 @@ export default function ProfilePage() {
             <PF label="LinkedIn" value={f.linkedin} onChange={v=>setField('linkedin',v)} />
             <PF label="Portfolio" value={f.portfolio} onChange={v=>setField('portfolio',v)} />
             <PF label="Telefon" value={f.contactPhone} onChange={v=>setField('contactPhone',v)} placeholder="+998..." />
+            
+            <div className="divider" />
+            <h3 style={{fontWeight:800,fontSize:14,color:'var(--navy)'}}>Rezyume</h3>
+            <ResumeUpload resumeUrl={f.resumeUrl} onUploaded={(url: string) => setField('resumeUrl', url)} />
+
             <button className="btn btn-primary" style={{width:'100%'}} onClick={save} disabled={saving}>{saving?'Saqlanmoqda...':'Saqlash'}</button>
           </div>
         ) : (
@@ -182,6 +187,7 @@ export default function ProfilePage() {
                   {f.github && <InfoRow svg='<svg width="14" height="14" fill="none" stroke="#1e3a5f" stroke-width="1.7" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' label="GitHub" value={f.github}/>}
                   {f.linkedin && <InfoRow svg='<svg width="14" height="14" fill="none" stroke="#1e3a5f" stroke-width="1.7" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>' label="LinkedIn" value={f.linkedin}/>}
                   {f.portfolio && <InfoRow svg='<svg width="14" height="14" fill="none" stroke="#1e3a5f" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>' label="Portfolio" value={f.portfolio}/>}
+                  {f.resumeUrl && <InfoRow svg='<svg width="14" height="14" fill="none" stroke="#1e3a5f" stroke-width="1.7" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/></svg>' label="Rezyume" value="Yuklangan ✓"/>}
                 </div>
               </div>
             )}
@@ -221,6 +227,47 @@ function InfoRow({svg,label,value}:{svg:string;label:string;value:string}) {
         <div style={{fontSize:10,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.05em'}}>{label}</div>
         <div style={{fontSize:14,fontWeight:600,color:'var(--navy)'}}>{value}</div>
       </div>
+    </div>
+  );
+}
+
+function ResumeUpload({resumeUrl, onUploaded}:{resumeUrl:string; onUploaded:(url:string)=>void}) {
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await api.upload.file(file);
+      onUploaded(res.url);
+    } catch (err: any) {
+      alert(err.message || 'Yuklashda xatolik');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div>
+      {resumeUrl ? (
+        <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',borderRadius:12,background:'var(--bg)',border:'1.5px solid rgba(30,58,95,0.1)'}}>
+          <svg width="20" height="20" fill="none" stroke="var(--navy)" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/></svg>
+          <a href={resumeUrl} target="_blank" rel="noopener noreferrer" style={{flex:1,fontSize:13,fontWeight:600,color:'var(--navy)',textDecoration:'none'}}>
+            Rezyume yuklangan ✓
+          </a>
+          <label style={{fontSize:12,fontWeight:700,color:'var(--gold)',cursor:'pointer'}}>
+            O&apos;zgartirish
+            <input type="file" accept=".pdf,.doc,.docx" onChange={handleFile} style={{display:'none'}} />
+          </label>
+        </div>
+      ) : (
+        <label style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'16px',borderRadius:12,border:'2px dashed rgba(30,58,95,0.2)',cursor:'pointer',background:'var(--bg)',fontSize:13,fontWeight:600,color:'var(--text-muted)'}}>
+          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          {uploading ? 'Yuklanmoqda...' : 'Rezyume yuklash (PDF, DOC)'}
+          <input type="file" accept=".pdf,.doc,.docx" onChange={handleFile} style={{display:'none'}} disabled={uploading} />
+        </label>
+      )}
     </div>
   );
 }
