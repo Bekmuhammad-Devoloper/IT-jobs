@@ -98,7 +98,6 @@ export default function CreatePage() {
                     {w}</button>)}
               </div>
             </FG>
-            </div>
             <FG label="Murojaat qilish vaqti">
               <input className="input" placeholder="10:00 - 19:00" value={f.link} onChange={e=>set('link',e.target.value)} />
             </FG>
@@ -163,7 +162,9 @@ export default function CreatePage() {
                     style={{fontSize:12,fontWeight:700,padding:'8px 16px',borderRadius:10,border:f.workType===w?'2px solid var(--navy)':'2px solid var(--border-strong)',background:f.workType===w?'var(--navy-light)':'#fff',color:f.workType===w?'var(--navy)':'var(--text-secondary)',cursor:'pointer',transition:'all 0.15s'}}>
                     {w}</button>)}
               </div>
-            </FG>          {/* ── COURSE ── */}
+            </FG>
+          </>)}
+          {/* ── COURSE ── */}
           {type === 'COURSE' && (<>
             <FG label="Kurs nomi" req>
               <input className="input" placeholder="Node.js Full Course" value={f.title} onChange={e=>set('title',e.target.value)} />
