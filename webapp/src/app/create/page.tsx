@@ -32,7 +32,7 @@ export default function CreatePage() {
     if (!f.title.trim()) return;
     setBusy(true);
     try {
-      await api.posts.create({...f, type, technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean), telegramId: user?.id});
+      await api.posts.create({...f, type, technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean)});
       router.push('/posts');
     } catch(e) { console.error(e); alert("Xatolik yuz berdi"); }
     finally { setBusy(false); }
