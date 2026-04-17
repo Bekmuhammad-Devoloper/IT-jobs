@@ -176,14 +176,18 @@ export class AdminService {
   // ── Services ──────────────────────────────────────────
 
   async getServices() {
-    return this.prisma.service.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.service.findMany({
+      where: { parentId: null },
+      include: { children: { orderBy: { order: 'asc' } } },
+      orderBy: { order: 'asc' },
+    });
   }
 
-  async createService(data: { title: string; slug?: string; description?: string; price?: string; icon?: string; link?: string; order?: number }) {
+  async createService(data: { title: string; description?: string; price?: string; icon?: string; order?: number; parentId?: number }) {
     return this.prisma.service.create({ data });
   }
 
-  async updateService(id: number, data: { title?: string; slug?: string; description?: string; price?: string; icon?: string; link?: string; order?: number; isActive?: boolean }) {
+  async updateService(id: number, data: { title?: string; description?: string; price?: string; icon?: string; order?: number; isActive?: boolean; parentId?: number }) {
     return this.prisma.service.update({ where: { id }, data });
   }
 

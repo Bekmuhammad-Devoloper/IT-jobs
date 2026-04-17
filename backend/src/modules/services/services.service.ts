@@ -7,7 +7,8 @@ export class ServicesService {
 
   async findAll() {
     return this.prisma.service.findMany({
-      where: { isActive: true },
+      where: { isActive: true, parentId: null },
+      include: { children: { where: { isActive: true }, orderBy: { order: 'asc' } } },
       orderBy: { order: 'asc' },
     });
   }

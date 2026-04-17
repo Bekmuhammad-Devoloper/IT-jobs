@@ -109,4 +109,19 @@ export const adminApi = {
     delete: (id: number) =>
       request(`/admin/services/${id}`, { method: 'DELETE' }),
   },
+
+  upload: {
+    file: async (file: File): Promise<{ url: string }> => {
+      const token = getToken();
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      return res.json();
+    },
+  },
 };
