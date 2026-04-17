@@ -173,6 +173,25 @@ export class AdminService {
     return { message: 'Technology deleted' };
   }
 
+  // ── Services ──────────────────────────────────────────
+
+  async getServices() {
+    return this.prisma.service.findMany({ orderBy: { order: 'asc' } });
+  }
+
+  async createService(data: { title: string; slug?: string; description?: string; price?: string; icon?: string; link?: string; order?: number }) {
+    return this.prisma.service.create({ data });
+  }
+
+  async updateService(id: number, data: { title?: string; slug?: string; description?: string; price?: string; icon?: string; link?: string; order?: number; isActive?: boolean }) {
+    return this.prisma.service.update({ where: { id }, data });
+  }
+
+  async deleteService(id: number) {
+    await this.prisma.service.delete({ where: { id } });
+    return { message: 'Service deleted' };
+  }
+
   // ── Serializers ──────────────────────────────────────────
 
   private serializeUser(user: any) {

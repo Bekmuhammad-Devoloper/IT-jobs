@@ -99,4 +99,14 @@ export const adminApi = {
     deleteTechnology: (id: number) =>
       request(`/admin/settings/technologies/${id}`, { method: 'DELETE' }),
   },
+
+  services: {
+    getAll: () => request('/admin/services'),
+    create: (data: any) =>
+      request('/admin/services', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: number, data: any) =>
+      request(`/admin/services/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: number) =>
+      request(`/admin/services/${id}`, { method: 'DELETE' }),
+  },
 };
