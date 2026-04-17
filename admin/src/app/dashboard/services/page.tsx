@@ -24,6 +24,12 @@ interface ServiceCategory {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
+function iconUrl(icon?: string) {
+  if (!icon) return '';
+  if (icon.startsWith('http') || icon.startsWith('/api/')) return icon;
+  return `${API_URL}/upload/${icon}`;
+}
+
 export default function AdminServicesPage() {
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,7 +79,7 @@ export default function AdminServicesPage() {
     setEditId(c.id); setParentId(null);
     setForm({ title: c.title, description: c.description || '', price: '', order: c.order });
     setIconFile(null);
-    setIconPreview(c.icon ? `${API_URL}/upload/${c.icon}` : null);
+    setIconPreview(c.icon ? iconUrl(c.icon) : null);
     setError('');
     setModal('category');
   }
@@ -101,7 +107,8 @@ export default function AdminServicesPage() {
       let iconName: string | undefined;
       if (iconFile) {
         const up: any = await adminApi.upload.file(iconFile);
-        iconName = up.url || up.filename;
+        const raw = up.filename || up.url || '';
+        iconName = raw.split('/').pop();
       }
 
       const payload: any = {
@@ -430,7 +437,7 @@ export default function AdminServicesPage() {
                 >
                   <div style={st.iconBox}>
                     {cat.icon
-                      ? <img src={`${API_URL}/upload/${cat.icon}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ? <img src={iconUrl(cat.icon)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" strokeWidth="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>}
                   </div>
 

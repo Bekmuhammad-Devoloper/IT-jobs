@@ -25,7 +25,7 @@ const storage = diskStorage({
 });
 
 const fileFilter = (_req: any, file: any, cb: any) => {
-  const allowed = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.webp'];
+  const allowed = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.webp', '.svg'];
   const ext = extname(file.originalname).toLowerCase();
   if (allowed.includes(ext)) {
     cb(null, true);
