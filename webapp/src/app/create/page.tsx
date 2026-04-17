@@ -34,7 +34,7 @@ export default function CreatePage() {
     try {
       await api.posts.create({...f, type, technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean)});
       router.push('/posts');
-    } catch(e) { console.error(e); alert("Xatolik yuz berdi"); }
+    } catch(e: any) { console.error(e); alert(e.message || "Xatolik yuz berdi"); }
     finally { setBusy(false); }
   }
 
