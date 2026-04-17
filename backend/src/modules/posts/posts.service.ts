@@ -24,15 +24,17 @@ export class PostsService {
   }
 
   async create(userId: number, dto: CreatePostDto) {
-    // Check cooldown
-    const cooldownKey = `cooldown:${userId}:${dto.type}`;
-    const hasCooldown = await this.redis.exists(cooldownKey);
-    if (hasCooldown) {
-      const ttl = await this.redis.getClient().ttl(cooldownKey);
-      const days = Math.ceil(ttl / 86400);
-      throw new BadRequestException(
-        `Siz ${dto.type} turi uchun ${days} kun kutishingiz kerak`,
-      );
+    // Check cooldown — only for RESUME type
+    if (dto.type === 'RESUME') {
+      const cooldownKey = `cooldown:${userId}:${dto.type}`;
+      const hasCooldown = await this.redis.exists(cooldownKey);
+      if (hasCooldown) {
+        const ttl = await this.redis.getClient().ttl(cooldownKey);
+        const days = Math.ceil(ttl / 86400);
+        throw new BadRequestException(
+          `Siz ${dto.type} turi uchun ${days} kun kutishingiz kerak`,
+        );
+      }
     }
 
     const post = await this.prisma.post.create({
@@ -44,12 +46,14 @@ export class PostsService {
       include: { author: true, category: true },
     });
 
-    // Set cooldown
-    await this.redis.set(
-      cooldownKey,
-      '1',
-      this.cooldownDays * 24 * 60 * 60,
-    );
+    // Set cooldown — only for RESUME type
+    if (dto.type === 'RESUME') {
+      await this.redis.set(
+        `cooldown:${userId}:${dto.type}`,
+        '1',
+        this.cooldownDays * 24 * 60 * 60,
+      );
+    }
 
     return this.serialize(post);
   }

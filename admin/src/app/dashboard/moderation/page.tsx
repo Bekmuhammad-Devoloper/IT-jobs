@@ -7,9 +7,18 @@ interface PendingPost {
   id: number;
   type: string;
   title: string;
+  description?: string;
   company?: string;
   city?: string;
-  author?: { firstName: string; lastName?: string };
+  salary?: string;
+  experience?: string;
+  workType?: string;
+  technologies?: string[];
+  contactPhone?: string;
+  contactEmail?: string;
+  contactTelegram?: string;
+  author?: { firstName: string; lastName?: string; username?: string };
+  category?: { name: string };
   createdAt: string;
 }
 
@@ -21,12 +30,21 @@ const typeLabels: Record<string, string> = {
   INTERNSHIP: 'Stajirovka',
 };
 
+const typeBadgeColors: Record<string, string> = {
+  VACANCY: '#2563eb',
+  RESUME: '#16a34a',
+  COURSE: '#9333ea',
+  MENTOR: '#ea580c',
+  INTERNSHIP: '#0891b2',
+};
+
 export default function ModerationPage() {
   const [posts, setPosts] = useState<PendingPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   useEffect(() => {
     loadPending();
@@ -58,6 +76,7 @@ export default function ModerationPage() {
     try {
       await adminApi.moderation.approve(id);
       setPosts((prev) => prev.filter((p) => p.id !== id));
+      if (expanded === id) setExpanded(null);
     } catch (e) {
       console.error(e);
     } finally {
@@ -71,6 +90,7 @@ export default function ModerationPage() {
     try {
       await adminApi.moderation.reject(id, reason || undefined);
       setPosts((prev) => prev.filter((p) => p.id !== id));
+      if (expanded === id) setExpanded(null);
     } catch (e) {
       console.error(e);
     } finally {
@@ -107,58 +127,108 @@ export default function ModerationPage() {
           <p className="empty-text">Kutilayotgan e&apos;lonlar yo&apos;q</p>
         </div>
       ) : (
-        <div className="admin-card">
-          <div className="flex-between mb-4">
+        <div>
+          <div className="admin-card" style={{marginBottom: 16}}>
             <p className="td-muted">
               {posts.length} ta e&apos;lon tekshiruv kutmoqda
             </p>
           </div>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tur</th>
-                <th>Sarlavha</th>
-                <th>Muallif</th>
-                <th>Sana</th>
-                <th>Amallar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((post) => (
-                <tr key={post.id}>
-                  <td className="td-id">#{post.id}</td>
-                  <td><span className="badge badge-blue">{typeLabels[post.type] || post.type}</span></td>
-                  <td className="td-bold">{post.title}</td>
-                  <td className="td-muted">{post.author?.firstName} {post.author?.lastName || ''}</td>
-                  <td className="td-date">
-                    {new Date(post.createdAt).toLocaleDateString('uz-UZ')}
-                  </td>
-                  <td>
-                    <div className="flex-gap-2">
-                      <button className="btn btn-success btn-sm" onClick={() => handleApprove(post.id)} title="Tasdiqlash"
-                        disabled={actionLoading === post.id}>
-                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.1"/>
-                          <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleReject(post.id)} title="Rad etish"
-                        disabled={actionLoading === post.id}>
-                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.1"/>
-                          <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
-                        </svg>
-                      </button>
+
+          <div style={{display:'flex',flexDirection:'column',gap:12}}>
+            {posts.map((post) => {
+              const isOpen = expanded === post.id;
+              const color = typeBadgeColors[post.type] || '#64748b';
+              return (
+                <div key={post.id} className="admin-card" style={{padding:0,overflow:'hidden'}}>
+                  {/* Header row — always visible */}
+                  <div
+                    style={{padding:'16px 20px',display:'flex',alignItems:'center',gap:12,cursor:'pointer',borderBottom: isOpen ? '1px solid rgba(30,58,95,0.08)' : 'none'}}
+                    onClick={() => setExpanded(isOpen ? null : post.id)}
+                  >
+                    <span style={{fontSize:12,fontWeight:700,padding:'3px 10px',borderRadius:6,color:'#fff',background:color}}>
+                      {typeLabels[post.type] || post.type}
+                    </span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontWeight:700,fontSize:15,color:'var(--navy)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{post.title}</div>
+                      <div style={{fontSize:12,color:'var(--text-muted)',marginTop:2}}>
+                        #{post.id} &middot; {post.author?.firstName} {post.author?.lastName || ''} &middot; {new Date(post.createdAt).toLocaleDateString('uz-UZ')}
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <svg width="18" height="18" fill="none" stroke="var(--text-muted)" strokeWidth="2" viewBox="0 0 24 24"
+                      style={{transform:isOpen?'rotate(180deg)':'rotate(0)',transition:'transform 0.2s',flexShrink:0}}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </div>
+
+                  {/* Expanded details */}
+                  {isOpen && (
+                    <div style={{padding:'16px 20px'}}>
+                      {/* Info grid */}
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px 20px',marginBottom:16}}>
+                        {post.company && <Detail label="Kompaniya" value={post.company}/>}
+                        {post.city && <Detail label="Shahar" value={post.city}/>}
+                        {post.salary && <Detail label="Maosh" value={post.salary}/>}
+                        {post.experience && <Detail label="Tajriba" value={post.experience}/>}
+                        {post.workType && <Detail label="Ish turi" value={post.workType}/>}
+                        {post.category?.name && <Detail label="Kategoriya" value={post.category.name}/>}
+                      </div>
+
+                      {/* Technologies */}
+                      {post.technologies && post.technologies.length > 0 && (
+                        <div style={{marginBottom:16}}>
+                          <div style={{fontSize:11,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:6}}>Texnologiyalar</div>
+                          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                            {post.technologies.map(t => (
+                              <span key={t} style={{fontSize:11,fontWeight:600,padding:'3px 10px',borderRadius:6,background:'rgba(30,58,95,0.06)',color:'var(--navy)'}}>{t}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Description */}
+                      {post.description && (
+                        <div style={{marginBottom:16}}>
+                          <div style={{fontSize:11,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:6}}>Tavsif</div>
+                          <div style={{fontSize:14,color:'var(--navy)',lineHeight:1.7,whiteSpace:'pre-wrap',background:'rgba(30,58,95,0.03)',padding:'12px 16px',borderRadius:10,border:'1px solid rgba(30,58,95,0.06)'}}>
+                            {post.description}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Contact info */}
+                      {(post.contactPhone || post.contactEmail || post.contactTelegram) && (
+                        <div style={{marginBottom:20}}>
+                          <div style={{fontSize:11,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:6}}>Aloqa</div>
+                          <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
+                            {post.contactPhone && <span style={{fontSize:13,color:'var(--navy)'}}>📞 {post.contactPhone}</span>}
+                            {post.contactEmail && <span style={{fontSize:13,color:'var(--navy)'}}>✉️ {post.contactEmail}</span>}
+                            {post.contactTelegram && <span style={{fontSize:13,color:'var(--navy)'}}>💬 {post.contactTelegram}</span>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action buttons */}
+                      <div style={{display:'flex',gap:10}}>
+                        <button className="btn btn-success" style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}
+                          onClick={() => handleApprove(post.id)} disabled={actionLoading === post.id}>
+                          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          Tasdiqlash
+                        </button>
+                        <button className="btn btn-danger" style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}
+                          onClick={() => handleReject(post.id)} disabled={actionLoading === post.id}>
+                          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>
+                          Rad etish
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
           {totalPages > 1 && (
-            <div className="pagination">
+            <div className="pagination" style={{marginTop:16}}>
               <button className="btn btn-ghost btn-sm" disabled={page <= 1}
                 onClick={() => setPage(page - 1)}>
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
@@ -174,6 +244,15 @@ export default function ModerationPage() {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function Detail({label, value}: {label: string; value: string}) {
+  return (
+    <div>
+      <div style={{fontSize:11,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.05em'}}>{label}</div>
+      <div style={{fontSize:14,fontWeight:600,color:'var(--navy)',marginTop:2}}>{value}</div>
     </div>
   );
 }

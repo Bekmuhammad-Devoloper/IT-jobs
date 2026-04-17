@@ -12,6 +12,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [f, setF] = useState({firstName:'',lastName:'',profession:'',bio:'',skills:'',city:'',github:'',linkedin:'',portfolio:'',contactPhone:'',resumeUrl:''});
+  const [myPosts, setMyPosts] = useState<any[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
 
   // Telegram user data via state (not render-time read, to handle SDK load timing)
   const [tgPhotoUrl, setTgPhotoUrl] = useState<string|null>(null);
@@ -45,6 +47,12 @@ export default function ProfilePage() {
         const p = r.data || r; setProfile(p);
         setF({firstName:p.firstName||'',lastName:p.lastName||'',profession:p.profession||'',bio:p.bio||'',skills:p.skills||'',city:p.city||'',github:p.github||'',linkedin:p.linkedin||'',portfolio:p.portfolio||'',contactPhone:p.contactPhone||'',resumeUrl:p.resumeUrl||''});
       }).catch(console.error).finally(() => setLoading(false));
+      // Load user's posts
+      setPostsLoading(true);
+      api.posts.getMy(1).then((r: any) => {
+        const data = r.data?.data || r.data || [];
+        setMyPosts(Array.isArray(data) ? data : []);
+      }).catch(console.error).finally(() => setPostsLoading(false));
     } else if (!storeLoading) {
       setLoading(false);
     }
@@ -173,6 +181,43 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* My Posts */}
+            <div className="card">
+              <h3 style={{fontWeight:800,fontSize:14,marginBottom:12,color:'var(--navy)',display:'flex',alignItems:'center',gap:6}}>
+                <svg width="14" height="14" fill="none" stroke="var(--navy)" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/></svg>
+                Mening e&apos;lonlarim
+              </h3>
+              {postsLoading ? (
+                <p style={{fontSize:13,color:'var(--text-muted)',textAlign:'center',padding:16}}>Yuklanmoqda...</p>
+              ) : myPosts.length === 0 ? (
+                <p style={{fontSize:13,color:'var(--text-muted)',textAlign:'center',padding:16}}>Hali e&apos;lon joylamadingiz</p>
+              ) : (
+                <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                  {myPosts.map((p: any) => {
+                    const statusColors: Record<string, {bg:string;color:string;label:string}> = {
+                      PENDING: {bg:'rgba(234,179,8,0.12)',color:'#b45309',label:'Kutilmoqda'},
+                      APPROVED: {bg:'rgba(22,163,74,0.1)',color:'#16a34a',label:'Tasdiqlangan'},
+                      REJECTED: {bg:'rgba(220,38,38,0.1)',color:'#dc2626',label:'Rad etilgan'},
+                    };
+                    const s = statusColors[p.status] || statusColors.PENDING;
+                    const typeLabels: Record<string,string> = {VACANCY:'Vakansiya',RESUME:'Rezyume',COURSE:'Kurs',MENTOR:'Mentor',INTERNSHIP:'Stajirovka'};
+                    return (
+                      <div key={p.id} style={{padding:'12px 14px',borderRadius:12,background:'var(--bg)',border:'1px solid rgba(30,58,95,0.06)',display:'flex',alignItems:'center',gap:10}}>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:14,fontWeight:700,color:'var(--navy)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.title}</div>
+                          <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,flexWrap:'wrap'}}>
+                            <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(30,58,95,0.06)',color:'var(--navy)'}}>{typeLabels[p.type]||p.type}</span>
+                            <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:s.bg,color:s.color}}>{s.label}</span>
+                            <span style={{fontSize:10,color:'var(--text-muted)'}}>{new Date(p.createdAt).toLocaleDateString('uz-UZ')}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {(f.city || f.contactPhone || f.github || f.linkedin || f.portfolio) && (
