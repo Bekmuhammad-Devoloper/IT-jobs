@@ -16,7 +16,7 @@ interface ServiceItem {
   createdAt: string;
 }
 
-const emptyForm = { title: '', slug: '', description: '', price: '', icon: '', link: '', order: 0 };
+const emptyForm = { title: '', description: '', price: '', order: 0 };
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<ServiceItem[]>([]);
@@ -51,11 +51,8 @@ export default function AdminServicesPage() {
     setEditId(s.id);
     setForm({
       title: s.title || '',
-      slug: s.slug || '',
       description: s.description || '',
       price: s.price || '',
-      icon: s.icon || '',
-      link: s.link || '',
       order: s.order || 0,
     });
     setError('');
@@ -70,7 +67,6 @@ export default function AdminServicesPage() {
       const payload = {
         ...form,
         order: Number(form.order) || 0,
-        slug: form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       };
       if (editId) {
         await adminApi.services.update(editId, payload);
@@ -144,18 +140,6 @@ export default function AdminServicesPage() {
             </div>
 
             <div>
-              <label style={{fontSize:13,fontWeight:700,color:'#1a2332',display:'block',marginBottom:6}}>Slug (URL uchun)</label>
-              <input
-                className="admin-input"
-                value={form.slug}
-                onChange={e => setForm({...form, slug: e.target.value})}
-                placeholder="rezyume-yozish (avtomatik yaratiladi)"
-                style={{padding:'12px 14px'}}
-              />
-              <p style={{fontSize:11,color:'#8896ab',marginTop:4}}>Bo&apos;sh qoldirsangiz nomdan avtomatik yaratiladi</p>
-            </div>
-
-            <div>
               <label style={{fontSize:13,fontWeight:700,color:'#1a2332',display:'block',marginBottom:6}}>Tavsif</label>
               <textarea
                 className="admin-input"
@@ -189,30 +173,6 @@ export default function AdminServicesPage() {
                 />
               </div>
             </div>
-
-            <div>
-              <label style={{fontSize:13,fontWeight:700,color:'#1a2332',display:'block',marginBottom:6}}>Ikonka (emoji)</label>
-              <input
-                className="admin-input"
-                value={form.icon}
-                onChange={e => setForm({...form, icon: e.target.value})}
-                placeholder="💼 📝 🎓 👨‍💻 ⚡"
-                style={{padding:'12px 14px',fontSize:18}}
-              />
-              <p style={{fontSize:11,color:'#8896ab',marginTop:4}}>Emoji kiriting, masalan: 💼 📝 🎓 👨‍💻 ⚡ 🚀 💡 🎯</p>
-            </div>
-
-            <div>
-              <label style={{fontSize:13,fontWeight:700,color:'#1a2332',display:'block',marginBottom:6}}>Havola (ixtiyoriy)</label>
-              <input
-                className="admin-input"
-                value={form.link}
-                onChange={e => setForm({...form, link: e.target.value})}
-                placeholder="https://t.me/itjobs_support"
-                style={{padding:'12px 14px'}}
-              />
-              <p style={{fontSize:11,color:'#8896ab',marginTop:4}}>Foydalanuvchi bosganda ochiladi. Bo&apos;sh bo&apos;lsa Telegram supportga yo&apos;naltiriladi</p>
-            </div>
           </div>
 
           {/* Preview */}
@@ -221,7 +181,7 @@ export default function AdminServicesPage() {
               <p style={{fontSize:11,fontWeight:700,color:'#8896ab',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:10}}>Ko&apos;rinishi (webapp)</p>
               <div style={{display:'flex',alignItems:'center',gap:14,padding:14,background:'#fff',borderRadius:10,border:'1px solid #e2e8f0'}}>
                 <div style={{width:48,height:48,borderRadius:14,background:'#eef2f7',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,flexShrink:0}}>
-                  {form.icon || '📦'}
+                  📦
                 </div>
                 <div style={{flex:1}}>
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:4}}>
