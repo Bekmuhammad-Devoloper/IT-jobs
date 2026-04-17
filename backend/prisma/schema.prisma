@@ -148,6 +148,7 @@ model Service {
     order       Int       @default(0)
     isActive    Boolean   @default(true) @map("is_active")
     parentId    Int?      @map("parent_id")
+    formFields  Json?     @map("form_fields")
     parent      Service?  @relation("ServiceChildren", fields: [parentId], references: [id], onDelete: Cascade)
     children    Service[] @relation("ServiceChildren")
     createdAt   DateTime  @default(now()) @map("created_at")

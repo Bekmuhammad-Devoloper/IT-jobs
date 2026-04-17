@@ -183,11 +183,11 @@ export class AdminService {
     });
   }
 
-  async createService(data: { title: string; description?: string; price?: string; icon?: string; order?: number; parentId?: number }) {
+  async createService(data: { title: string; description?: string; price?: string; icon?: string; order?: number; parentId?: number; formFields?: any }) {
     return this.prisma.service.create({ data });
   }
 
-  async updateService(id: number, data: { title?: string; description?: string; price?: string; icon?: string; order?: number; isActive?: boolean; parentId?: number }) {
+  async updateService(id: number, data: { title?: string; description?: string; price?: string; icon?: string; order?: number; isActive?: boolean; parentId?: number; formFields?: any }) {
     return this.prisma.service.update({ where: { id }, data });
   }
 
