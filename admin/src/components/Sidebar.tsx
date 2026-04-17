@@ -17,9 +17,12 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div style={{padding:'22px 20px',borderBottom:'1px solid rgba(184,160,106,0.1)',display:'flex',alignItems:'center',gap:12}}>
-        <div style={{width:42,height:42,borderRadius:12,overflow:'hidden',background:'#fff',padding:2,boxShadow:'0 2px 10px rgba(0,0,0,0.3)',flexShrink:0}}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Yuksalish.dev" style={{width:'200%',height:'100%',objectFit:'cover',objectPosition:'70% center',borderRadius:10}} />
+        <div style={{width:42,height:42,borderRadius:12,overflow:'hidden',background:'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 100%)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 10px rgba(0,0,0,0.3)',flexShrink:0}}>
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+            <rect x="4" y="8" width="14" height="24" rx="2" fill="#d4c494" opacity="0.9"/>
+            <rect x="12" y="4" width="14" height="24" rx="2" fill="#fff" opacity="0.85"/>
+            <rect x="20" y="12" width="14" height="24" rx="2" fill="#d4c494" opacity="0.7"/>
+          </svg>
         </div>
         <div>
           <div style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.02em'}}>Yuksalish<span style={{color:'#d4c494'}}>.dev</span></div>
