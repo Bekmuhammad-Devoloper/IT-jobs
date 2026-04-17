@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHmac } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -39,20 +40,24 @@ export class AuthService {
     });
 
     if (!user) {
+      const photoUrl = userData.photo_url || await this.fetchTelegramPhotoUrl(userData.id);
       user = await this.prisma.user.create({
         data: {
           telegramId: BigInt(userData.id),
           username: userData.username || null,
           firstName: userData.first_name || null,
           lastName: userData.last_name || null,
-          photoUrl: userData.photo_url || null,
+          photoUrl: photoUrl || null,
         },
       });
       this.logger.log(`New user created: ${userData.id}`);
     } else {
       // Update photo and username on each login
       const updateData: any = {};
-      if (userData.photo_url && userData.photo_url !== user.photoUrl) updateData.photoUrl = userData.photo_url;
+      if (!user.photoUrl || (userData.photo_url && userData.photo_url !== user.photoUrl)) {
+        const photoUrl = userData.photo_url || await this.fetchTelegramPhotoUrl(user.telegramId);
+        if (photoUrl) updateData.photoUrl = photoUrl;
+      }
       if (userData.username && userData.username !== user.username) updateData.username = userData.username;
       if (userData.first_name && userData.first_name !== user.firstName) updateData.firstName = userData.first_name;
       if (userData.last_name !== undefined && userData.last_name !== user.lastName) updateData.lastName = userData.last_name || null;
@@ -153,5 +158,28 @@ export class AuthService {
       telegramId: user.telegramId.toString(),
       rating: user.rating ? Number(user.rating) : 0,
     };
+  }
+
+  async fetchTelegramPhotoUrl(telegramId: string | bigint): Promise<string | null> {
+    try {
+      const botToken = this.configService.get<string>('BOT_TOKEN')!;
+      const res = await axios.get(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos`, {
+        params: { user_id: telegramId.toString(), limit: 1 },
+      });
+      const photos = res.data?.result?.photos;
+      if (!photos || photos.length === 0) return null;
+      // Get the largest photo
+      const photo = photos[0];
+      const fileId = photo[photo.length - 1].file_id;
+      const fileRes = await axios.get(`https://api.telegram.org/bot${botToken}/getFile`, {
+        params: { file_id: fileId },
+      });
+      const filePath = fileRes.data?.result?.file_path;
+      if (!filePath) return null;
+      return `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+    } catch (e) {
+      this.logger.warn(`Failed to fetch TG photo for ${telegramId}: ${e.message}`);
+      return null;
+    }
   }
 }
