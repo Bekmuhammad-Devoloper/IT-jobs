@@ -6,10 +6,11 @@ import { AdminSettingsController } from './admin-settings.controller';
 import { AdminServicesController } from './admin-services.controller';
 import { AdminService } from './admin.service';
 import { AuthModule } from '../auth/auth.module';
+import { TelegramModule } from '../telegram/telegram.module';
 import { AdminGuard } from '../../common/guards/admin.guard';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, TelegramModule],
   controllers: [
     AdminUsersController,
     AdminPostsController,

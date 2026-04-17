@@ -43,35 +43,185 @@ export class TelegramService {
   }
 
   async sendPostToChannel(post: any) {
-    const typeLabels: Record<string, string> = {
-      VACANCY: '💼 Vakansiya',
-      RESUME: '📄 Rezyume',
-      COURSE: '📚 Kurs',
-      MENTOR: '👨‍🏫 Mentor',
-      INTERNSHIP: '🎓 Stajirovka',
-    };
+    const channelUsername = this.config.get('CHANNEL_USERNAME', '@Yuksalishdev_ITjobs');
+    const webappUrl = this.config.get('WEBAPP_URL', 'https://it-jobs.bekmuhammad.uz');
+    const detailLink = `${webappUrl}/posts/${post.id}`;
+    const author = post.author;
+    const authorName = [author?.firstName, author?.lastName].filter(Boolean).join(' ') || 'Noma\'lum';
 
+    let text = '';
+
+    switch (post.type) {
+      case 'RESUME':
+        text = this.formatResume(post, authorName, channelUsername, detailLink);
+        break;
+      case 'VACANCY':
+        text = this.formatVacancy(post, authorName, channelUsername, detailLink);
+        break;
+      case 'MENTOR':
+        text = this.formatMentor(post, authorName, channelUsername, detailLink);
+        break;
+      case 'INTERNSHIP':
+        text = this.formatInternship(post, authorName, channelUsername, detailLink);
+        break;
+      case 'COURSE':
+        text = this.formatCourse(post, authorName, channelUsername, detailLink);
+        break;
+      default:
+        text = this.formatDefault(post, authorName, channelUsername, detailLink);
+    }
+
+    await this.sendToChannel(text);
+  }
+
+  // ── RESUME ──
+  private formatResume(p: any, authorName: string, channel: string, link: string): string {
     const lines: string[] = [
-      `<b>${typeLabels[post.type] || post.type}</b>`,
-      '',
-      `📌 <b>${post.title}</b>`,
+      `👨‍💼 <b>Xodim: ${authorName}</b>`,
     ];
-
-    if (post.company) lines.push(`🏢 ${post.company}`);
-    if (post.city) lines.push(`📍 ${post.city}`);
-    if (post.salary) lines.push(`💰 ${post.salary}`);
-    if (post.technologies?.length) {
-      lines.push(`🛠 ${post.technologies.join(', ')}`);
+    if (p.author?.age) lines.push(`🕑 <b>Yosh:</b> ${p.author.age}`);
+    if (p.technologies?.length) lines.push(`📚 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
+    if (p.contactTelegram) lines.push(`🇺🇿 <b>Telegram:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 <b>Aloqa:</b> ${p.contactPhone}`);
+    if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
+    if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
+    if (p.author?.profession) lines.push(`👨🏻‍💻 <b>Kasbi:</b> ${p.author.profession}`);
+    if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
+    if (p.workType) lines.push(`🕰 <b>Ish turi:</b> ${p.workType}`);
+    if (p.description) {
+      lines.push('');
+      lines.push(`🔎 <b>Maqsad:</b> ${p.description}`);
     }
-    if (post.description) {
-      const short = post.description.length > 200
-        ? post.description.substring(0, 200) + '...'
-        : post.description;
-      lines.push('', short);
+    lines.push('');
+    lines.push(`#xodim ${this.buildHashtags(p)}`);
+    lines.push('');
+    lines.push(`� <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    return lines.join('\n');
+  }
+
+  // ── VACANCY ──
+  private formatVacancy(p: any, authorName: string, channel: string, link: string): string {
+    const lines: string[] = [
+      `💼 <b>Vakansiya: ${p.title}</b>`,
+    ];
+    if (p.company) lines.push(`🏢 <b>Kompaniya:</b> ${p.company}`);
+    if (p.city) lines.push(`📍 <b>Hudud:</b> ${p.city}`);
+    if (p.salary) lines.push(`💰 <b>Maosh:</b> ${p.salary}`);
+    if (p.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience}`);
+    if (p.workType) lines.push(`� <b>Ish turi:</b> ${p.workType}`);
+    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
+    if (p.description) {
+      lines.push('');
+      lines.push(p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description);
     }
+    lines.push('');
+    if (p.contactTelegram) lines.push(`📩 <b>Aloqa:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 ${p.contactPhone}`);
+    lines.push('');
+    lines.push(`#vakansiya ${this.buildHashtags(p)}`);
+    lines.push('');
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    return lines.join('\n');
+  }
 
-    lines.push('', `👉 <a href="${this.config.get('WEBAPP_URL', 'https://itjobs.uz')}/posts/${post.id}">Batafsil ko'rish</a>`);
+  // ── MENTOR ──
+  private formatMentor(p: any, authorName: string, channel: string, link: string): string {
+    const lines: string[] = [
+      `👨‍🏫 <b>Mentor: ${authorName}</b>`,
+    ];
+    if (p.title && p.title !== authorName) lines.push(`📌 <b>${p.title}</b>`);
+    if (p.author?.profession) lines.push(`� <b>Kasbi:</b> ${p.author.profession}`);
+    if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
+    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
+    if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
+    if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
+    if (p.description) {
+      lines.push('');
+      lines.push(`📝 ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
+    }
+    lines.push('');
+    if (p.contactTelegram) lines.push(`📩 <b>Aloqa:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 ${p.contactPhone}`);
+    lines.push('');
+    lines.push(`#mentor ${this.buildHashtags(p)}`);
+    lines.push('');
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    return lines.join('\n');
+  }
 
-    await this.sendToChannel(lines.join('\n'));
+  // ── INTERNSHIP ──
+  private formatInternship(p: any, authorName: string, channel: string, link: string): string {
+    const lines: string[] = [
+      `🎓 <b>Stajirovka: ${p.title}</b>`,
+    ];
+    if (p.company) lines.push(`🏢 <b>Kompaniya:</b> ${p.company}`);
+    if (p.city) lines.push(`📍 <b>Hudud:</b> ${p.city}`);
+    if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
+    if (p.experience) lines.push(`📊 <b>Talab:</b> ${p.experience}`);
+    if (p.workType) lines.push(`🕐 <b>Ish turi:</b> ${p.workType}`);
+    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
+    if (p.description) {
+      lines.push('');
+      lines.push(p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description);
+    }
+    lines.push('');
+    if (p.contactTelegram) lines.push(`📩 <b>Aloqa:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 ${p.contactPhone}`);
+    lines.push('');
+    lines.push(`#stajirovka ${this.buildHashtags(p)}`);
+    lines.push('');
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    return lines.join('\n');
+  }
+
+  // ── COURSE ──
+  private formatCourse(p: any, authorName: string, channel: string, link: string): string {
+    const lines: string[] = [
+      `📚 <b>Kurs: ${p.title}</b>`,
+    ];
+    if (p.company) lines.push(`🏫 <b>O'quv markaz:</b> ${p.company}`);
+    if (p.city) lines.push(`� <b>Hudud:</b> ${p.city}`);
+    if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
+    if (p.workType) lines.push(`🕐 <b>Format:</b> ${p.workType}`);
+    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
+    if (p.description) {
+      lines.push('');
+      lines.push(p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description);
+    }
+    lines.push('');
+    if (p.contactTelegram) lines.push(`📩 <b>Aloqa:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 ${p.contactPhone}`);
+    lines.push('');
+    lines.push(`#kurs ${this.buildHashtags(p)}`);
+    lines.push('');
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    return lines.join('\n');
+  }
+
+  // ── DEFAULT ──
+  private formatDefault(p: any, authorName: string, channel: string, link: string): string {
+    const lines: string[] = [
+      `📌 <b>${p.title}</b>`,
+      '',
+    ];
+    if (p.description) lines.push(p.description.length > 300 ? p.description.substring(0, 300) + '...' : p.description);
+    lines.push('');
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    return lines.join('\n');
+  }
+
+  private buildHashtags(p: any): string {
+    const tags: string[] = [];
+    if (p.technologies?.length) {
+      p.technologies.slice(0, 5).forEach((t: string) => {
+        const clean = t.replace(/[^a-zA-Z0-9а-яА-ЯёЁ]/g, '');
+        if (clean) tags.push(`#${clean}`);
+      });
+    }
+    if (p.city) {
+      const cleanCity = p.city.replace(/[^a-zA-Z0-9а-яА-ЯёЁ]/g, '');
+      if (cleanCity) tags.push(`#${cleanCity}`);
+    }
+    return tags.join(' ');
   }
 }

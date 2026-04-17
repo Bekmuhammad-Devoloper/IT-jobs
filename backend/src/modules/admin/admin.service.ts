@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { TelegramService } from '../telegram/telegram.service';
 import { PostStatus, UserRole } from '@prisma/client';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
+    private readonly telegram: TelegramService,
   ) {}
 
   // ── Users ──────────────────────────────────────────────
@@ -108,8 +110,16 @@ export class AdminService {
     const post = await this.prisma.post.update({
       where: { id },
       data: { status: PostStatus.APPROVED },
-      include: { author: true },
+      include: { author: true, category: true },
     });
+
+    // Publish to Telegram channel
+    try {
+      await this.telegram.sendPostToChannel(post);
+    } catch (e) {
+      // Don't fail the approval if channel send fails
+    }
+
     return this.serializePost(post);
   }
 
