@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHmac } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
-import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -163,18 +162,15 @@ export class AuthService {
   async fetchTelegramPhotoUrl(telegramId: string | bigint): Promise<string | null> {
     try {
       const botToken = this.configService.get<string>('BOT_TOKEN')!;
-      const res = await axios.get(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos`, {
-        params: { user_id: telegramId.toString(), limit: 1 },
-      });
-      const photos = res.data?.result?.photos;
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos?user_id=${telegramId}&limit=1`);
+      const data = await res.json();
+      const photos = data?.result?.photos;
       if (!photos || photos.length === 0) return null;
-      // Get the largest photo
       const photo = photos[0];
       const fileId = photo[photo.length - 1].file_id;
-      const fileRes = await axios.get(`https://api.telegram.org/bot${botToken}/getFile`, {
-        params: { file_id: fileId },
-      });
-      const filePath = fileRes.data?.result?.file_path;
+      const fileRes = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
+      const fileData = await fileRes.json();
+      const filePath = fileData?.result?.file_path;
       if (!filePath) return null;
       return `https://api.telegram.org/file/bot${botToken}/${filePath}`;
     } catch (e) {
