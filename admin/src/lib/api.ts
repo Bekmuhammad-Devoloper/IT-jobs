@@ -1,5 +1,5 @@
 const API_URL = typeof window !== 'undefined'
-  ? '/api'  // browser: use Next.js rewrite proxy
+  ? '/api'  // browser: nginx proxies /api to backend
   : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'); // server-side
 
 function getToken(): string {
@@ -23,7 +23,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (res.status === 401) {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('admin_token');
-      window.location.href = '/login';
+      window.location.href = '/admin/login';
     }
     throw new Error('Unauthorized');
   }

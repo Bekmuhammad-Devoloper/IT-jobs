@@ -61,7 +61,7 @@ export default function Sidebar() {
         <button
           className="sidebar-link"
           style={{width:'100%',border:'none',background:'transparent',cursor:'pointer'}}
-          onClick={() => { localStorage.removeItem('admin_token'); window.location.href = '/login'; }}
+          onClick={() => { localStorage.removeItem('admin_token'); window.location.href = '/admin/login'; }}
         >
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
             <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
