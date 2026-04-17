@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 
 interface UserItem {
@@ -9,6 +10,7 @@ interface UserItem {
   firstName: string;
   lastName?: string;
   username?: string;
+  photoUrl?: string;
   role: string;
   isBlocked: boolean;
   rating: number;
@@ -154,10 +156,16 @@ export default function AdminUsersPage() {
                     <td className="td-id">#{user.id}</td>
                     <td>
                       <div className="flex-gap-3">
-                        <div className="user-avatar">
-                          {user.firstName.charAt(0).toUpperCase()}
-                        </div>
-                        <span className="td-bold">{user.firstName} {user.lastName || ''}</span>
+                        {user.photoUrl ? (
+                          <img src={user.photoUrl} alt={user.firstName} style={{width:36,height:36,borderRadius:10,objectFit:'cover',border:'2px solid rgba(184,160,106,0.2)'}} />
+                        ) : (
+                          <div className="user-avatar">
+                            {user.firstName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <Link href={`/dashboard/users/${user.id}`} className="td-bold" style={{textDecoration:'none',color:'inherit'}}>
+                          {user.firstName} {user.lastName || ''}
+                        </Link>
                       </div>
                     </td>
                     <td className="td-muted">{user.username ? `@${user.username}` : '-'}</td>
@@ -187,11 +195,22 @@ export default function AdminUsersPage() {
                       {new Date(user.createdAt).toLocaleDateString('uz-UZ')}
                     </td>
                     <td>
-                      <button
-                        className={`btn btn-sm ${user.isBlocked ? 'btn-success' : 'btn-danger'}`}
-                        onClick={() => toggleBlock(user)}
-                        title={user.isBlocked ? 'Blokdan chiqarish' : 'Bloklash'}
-                      >
+                      <div style={{display:'flex',gap:6}}>
+                        <Link
+                          href={`/dashboard/users/${user.id}`}
+                          className="btn btn-sm btn-ghost"
+                          title="Foydalanuvchi profilini ko'rish"
+                        >
+                          <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.06"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
+                          </svg>
+                        </Link>
+                        <button
+                          className={`btn btn-sm ${user.isBlocked ? 'btn-success' : 'btn-danger'}`}
+                          onClick={() => toggleBlock(user)}
+                          title={user.isBlocked ? 'Blokdan chiqarish' : 'Bloklash'}
+                        >
                         {user.isBlocked ? (
                           <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                             <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.06"/>
@@ -206,6 +225,7 @@ export default function AdminUsersPage() {
                           </svg>
                         )}
                       </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

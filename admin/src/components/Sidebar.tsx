@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.08"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.15"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.15"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.08"/></svg>' },
@@ -18,7 +17,10 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div style={{padding:'22px 20px',borderBottom:'1px solid rgba(184,160,106,0.1)',display:'flex',alignItems:'center',gap:12}}>
-        <Image src="/logo.png" alt="Yuksalish.dev" width={38} height={38} style={{objectFit:'contain',filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.3))'}} />
+        <div style={{width:42,height:42,borderRadius:12,overflow:'hidden',background:'#fff',padding:2,boxShadow:'0 2px 10px rgba(0,0,0,0.3)',flexShrink:0}}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Yuksalish.dev" style={{width:'200%',height:'100%',objectFit:'cover',objectPosition:'70% center',borderRadius:10}} />
+        </div>
         <div>
           <div style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.02em'}}>Yuksalish<span style={{color:'#d4c494'}}>.dev</span></div>
           <div style={{fontSize:9,color:'rgba(255,255,255,0.3)',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase'}}>Admin Panel</div>
@@ -39,6 +41,20 @@ export default function Sidebar() {
       </nav>
 
       <div style={{padding:'16px 10px',borderTop:'1px solid rgba(184,160,106,0.08)'}}>
+        <a
+          href="https://it-jobs.bekmuhammad.uz"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sidebar-link"
+          style={{textDecoration:'none',marginBottom:4}}
+        >
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.06"/>
+            <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="1.8"/>
+            <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="currentColor" strokeWidth="1.8"/>
+          </svg>
+          <span>Web saytga o&apos;tish</span>
+        </a>
         <button
           className="sidebar-link"
           style={{width:'100%',border:'none',background:'transparent',cursor:'pointer'}}

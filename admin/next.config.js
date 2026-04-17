@@ -1,8 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  basePath: '/admin',
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 't.me' },
+      { protocol: 'https', hostname: '*.telegram.org' },
+      { protocol: 'https', hostname: 'telegram.org' },
+      { protocol: 'https', hostname: '*.t.me' },
+    ],
+    unoptimized: true,
+  },
   async rewrites() {
     return [
       {
