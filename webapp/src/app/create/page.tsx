@@ -89,12 +89,15 @@ export default function CreatePage() {
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <FG label="Kutilayotgan maosh"><input className="input" placeholder="100$ - 300$" value={f.salary} onChange={e=>set('salary',e.target.value)} /></FG>
-              <FG label="Ish turi">
-                <select className="input" value={f.workType} onChange={e=>set('workType',e.target.value)} style={{height:44}}>
-                  <option value="">Tanlang</option>
-                  {WORKS.map(w=><option key={w} value={w}>{w}</option>)}
-                </select>
-              </FG>
+            </div>
+            <FG label="Ish turi">
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                {WORKS.map(w=>
+                  <button key={w} type="button" onClick={() => set('workType',w)}
+                    style={{fontSize:12,fontWeight:700,padding:'8px 16px',borderRadius:10,border:f.workType===w?'2px solid var(--navy)':'2px solid var(--border-strong)',background:f.workType===w?'var(--navy-light)':'#fff',color:f.workType===w?'var(--navy)':'var(--text-secondary)',cursor:'pointer',transition:'all 0.15s'}}>
+                    {w}</button>)}
+              </div>
+            </FG>
             </div>
             <FG label="Murojaat qilish vaqti">
               <input className="input" placeholder="10:00 - 19:00" value={f.link} onChange={e=>set('link',e.target.value)} />
@@ -152,18 +155,15 @@ export default function CreatePage() {
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <FG label="Narxi"><input className="input" placeholder="50$ / oy" value={f.salary} onChange={e=>set('salary',e.target.value)} /></FG>
-              <FG label="Format">
-                <select className="input" value={f.workType} onChange={e=>set('workType',e.target.value)} style={{height:44}}>
-                  <option value="">Tanlang</option>
-                  <option value="Onlayn">Onlayn</option>
-                  <option value="Oflayn">Oflayn</option>
-                  <option value="Gibrid">Gibrid</option>
-                </select>
-              </FG>
             </div>
-          </>)}
-
-          {/* ── COURSE ── */}
+            <FG label="Format">
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                {['Onlayn','Oflayn','Gibrid'].map(w=>
+                  <button key={w} type="button" onClick={() => set('workType',w)}
+                    style={{fontSize:12,fontWeight:700,padding:'8px 16px',borderRadius:10,border:f.workType===w?'2px solid var(--navy)':'2px solid var(--border-strong)',background:f.workType===w?'var(--navy-light)':'#fff',color:f.workType===w?'var(--navy)':'var(--text-secondary)',cursor:'pointer',transition:'all 0.15s'}}>
+                    {w}</button>)}
+              </div>
+            </FG>          {/* ── COURSE ── */}
           {type === 'COURSE' && (<>
             <FG label="Kurs nomi" req>
               <input className="input" placeholder="Node.js Full Course" value={f.title} onChange={e=>set('title',e.target.value)} />
@@ -177,15 +177,15 @@ export default function CreatePage() {
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <FG label="Narxi"><input className="input" placeholder="500 000 so'm" value={f.salary} onChange={e=>set('salary',e.target.value)} /></FG>
-              <FG label="Format">
-                <select className="input" value={f.workType} onChange={e=>set('workType',e.target.value)} style={{height:44}}>
-                  <option value="">Tanlang</option>
-                  <option value="Onlayn">Onlayn</option>
-                  <option value="Oflayn">Oflayn</option>
-                  <option value="Gibrid">Gibrid</option>
-                </select>
-              </FG>
             </div>
+            <FG label="Format">
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                {['Onlayn','Oflayn','Gibrid'].map(w=>
+                  <button key={w} type="button" onClick={() => set('workType',w)}
+                    style={{fontSize:12,fontWeight:700,padding:'8px 16px',borderRadius:10,border:f.workType===w?'2px solid var(--navy)':'2px solid var(--border-strong)',background:f.workType===w?'var(--navy-light)':'#fff',color:f.workType===w?'var(--navy)':'var(--text-secondary)',cursor:'pointer',transition:'all 0.15s'}}>
+                    {w}</button>)}
+              </div>
+            </FG>
             <FG label="Texnologiyalar" hint="vergul bilan">
               <input className="input" placeholder="React, Node.js" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
             </FG>
