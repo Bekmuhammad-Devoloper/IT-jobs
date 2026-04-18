@@ -89,10 +89,10 @@ export class TelegramService {
 
   // ── RESUME ──
   private formatResume(p: any, authorName: string, channel: string, link: string): string {
-    const lines: string[] = [
-      `<b>Ish joyi kerak:</b>`,
-      '',
-    ];
+    const lines: string[] = [];
+    if (p.title) lines.push(`📌 <b>${p.title}</b>`);
+    lines.push(`<b>Ish joyi kerak:</b>`);
+    lines.push('');
     lines.push(`👨‍💼 <b>Xodim:</b> ${authorName}`);
     if (p.author?.age) lines.push(`🕑 <b>Yosh:</b> ${p.author.age}`);
     if (p.technologies?.length) lines.push(`📚 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
