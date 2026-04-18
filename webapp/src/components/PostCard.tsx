@@ -38,8 +38,8 @@ function ResumeCard({ post }: { post: Post }) {
                 </div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                {post.experience && (<div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{'📊'} {post.experience}</div>)}
-                {post.city && (<div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', marginTop: 2 }}>{'📍'} {post.city}</div>)}
+                {post.experience && (<div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-8v4h8V3z"/><path d="M12 11v4"/></svg> {post.experience}</div>)}
+                {post.city && (<div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', marginTop: 3 }}><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2.5"/></svg> {post.city}</div>)}
               </div>
             </div>
             {post.technologies && post.technologies.length > 0 && (
@@ -56,9 +56,9 @@ function ResumeCard({ post }: { post: Post }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {[1, 2, 3, 4, 5].map(i => (<svg key={i} width="13" height="13" viewBox="0 0 24 24" fill={i <= rating ? 'var(--gold)' : 'none'} stroke={i <= rating ? 'var(--gold)' : '#ccc'} strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>))}
+            {[1, 2, 3, 4, 5].map(i => (<svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i <= rating ? '#f5b731' : 'none'} stroke={i <= rating ? '#f5b731' : '#d1d5db'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>))}
           </div>
-          {post.salary ? (<div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: 'var(--gold-dark)' }}>{'💰'} {post.salary}</div>) : <span />}
+          {post.salary ? (<div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: 'var(--gold-dark)' }}><svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> {post.salary}</div>) : <span />}
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}><svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg> {views}</span>
           {author && (<div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>{photoUrl ? (<img src={photoUrl} alt="" style={{ width: 18, height: 18, borderRadius: 6, objectFit: 'cover' }} />) : (<div style={{ width: 18, height: 18, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,var(--navy),#2a4f7a)', color: '#fff', fontSize: 9, fontWeight: 800 }}>{name[0]}</div>)}<span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)' }}>{author.firstName}</span></div>)}
         </div>
