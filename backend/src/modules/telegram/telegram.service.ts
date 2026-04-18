@@ -86,7 +86,10 @@ export class TelegramService {
     const reply_markup = {
       inline_keyboard: [[{ text: '👉 Batafsil ko\'rish', web_app: { url: detailLink } }]],
     };
-    const msg = await this.sendToChannel(text, 'HTML', { reply_markup });
+    const msg = await this.sendToChannel(text, 'HTML', {
+      reply_markup,
+      link_preview_options: { is_disabled: true },
+    });
     return msg; // returns message object with message_id
   }
 
@@ -129,7 +132,7 @@ export class TelegramService {
     const authorTg = p.author?.username ? `@${p.author.username}` : (p.contactTelegram || '');
     lines.push(`👷 <b>Mas'ul:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
     if (p.link) lines.push(`🕰 <b>Murojaat vaqti:</b> ${p.link}`);
-    if (p.workType) lines.push(`🕐 <b>Ish vaqti:</b> ${p.workType}`);
+    if (p.workType) lines.push(`🕐 <b>Ish formati:</b> ${p.workType}`);
     if (p.salary) lines.push(`💰 <b>Maosh:</b> ${p.salary}`);
     if (p.description) {
       lines.push(`‼️ <b>Qo'shimcha:</b> ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
