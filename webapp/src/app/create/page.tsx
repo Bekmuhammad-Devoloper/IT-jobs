@@ -85,15 +85,20 @@ export default function CreatePage() {
           <FG label="Tavsif">
             <textarea className="input" rows={4} placeholder="Batafsil ma'lumot..." value={f.description} onChange={e=>set('description',e.target.value)} />
           </FG>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <FG label="Kompaniya"><input className="input" placeholder="Kompaniya" value={f.company} onChange={e=>set('company',e.target.value)} /></FG>
+          {type !== 'RESUME' && (
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+              <FG label="Kompaniya"><input className="input" placeholder="Kompaniya" value={f.company} onChange={e=>set('company',e.target.value)} /></FG>
+              <FG label="Shahar"><input className="input" placeholder="Toshkent" value={f.city} onChange={e=>set('city',e.target.value)} /></FG>
+            </div>
+          )}
+          {type === 'RESUME' && (
             <FG label="Shahar"><input className="input" placeholder="Toshkent" value={f.city} onChange={e=>set('city',e.target.value)} /></FG>
-          </div>
+          )}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
             <FG label="Maosh"><input className="input" placeholder="1000 - 2000 $" value={f.salary} onChange={e=>set('salary',e.target.value)} /></FG>
             <FG label="Tajriba"><input className="input" placeholder="3+ yil" value={f.experience} onChange={e=>set('experience',e.target.value)} /></FG>
           </div>
-          <FG label="Ish turi">
+          <FG label={type === 'VACANCY' ? "Ish formati" : "Ish turi"}>
             <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
               {WORKS.map(w => (
                 <button key={w} type="button" onClick={() => set('workType',w)}
@@ -106,8 +111,8 @@ export default function CreatePage() {
           <FG label="Texnologiyalar" hint="vergul bilan">
             <input className="input" placeholder="React, Node.js, TypeScript" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
           </FG>
-          <FG label="Havola">
-            <input className="input" placeholder="https://..." value={f.link} onChange={e=>set('link',e.target.value)} />
+          <FG label={type === 'RESUME' ? "Murojaat qilish vaqti" : "Havola"}>
+            <input className="input" placeholder={type === 'RESUME' ? "5:00 16:00" : "https://..."} value={f.link} onChange={e=>set('link',e.target.value)} />
           </FG>
 
           <div className="divider" />
