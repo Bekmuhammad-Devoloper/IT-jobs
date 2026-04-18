@@ -6,12 +6,19 @@ import type { Post } from '@/types';
 import { getPostTypeLabel, getPostTypeColor, formatDate, generateFingerprint } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useTelegram } from '@/hooks/useTelegram';
 
 export default function PostDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user: tgUser } = useTelegram();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showApply, setShowApply] = useState(false);
+  const [applyData, setApplyData] = useState({ message: '', resumeUrl: '', portfolio: '' });
+  const [applying, setApplying] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   useEffect(() => {
     const id = Number(params.id);
@@ -122,6 +129,94 @@ export default function PostDetailPage() {
               </div>
               {post.author.rating > 0 && <span style={{fontSize:12,fontWeight:800,padding:'6px 14px',borderRadius:10,background:'var(--gold-light)',color:'var(--gold-dark)'}}>&#9733; {post.author.rating}</span>}
             </a>
+          </div>
+        )}
+
+        {/* ── Apply to Vacancy ── */}
+        {post.type === 'VACANCY' && !(post as any).isClosed && (
+          <div className="card">
+            {applied ? (
+              <div style={{textAlign:'center',padding:'16px 0'}}>
+                <div style={{fontSize:32,marginBottom:8}}>✅</div>
+                <p style={{fontWeight:700,fontSize:14,color:'var(--navy)'}}>Murojaatingiz yuborildi!</p>
+                <p style={{fontSize:12,color:'var(--text-muted)',marginTop:4}}>Vakansiya egasi siz bilan bog&apos;lanadi</p>
+              </div>
+            ) : !showApply ? (
+              <button className="btn btn-primary" style={{width:'100%'}} onClick={() => setShowApply(true)}>
+                📩 Murojaat qilish
+              </button>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                <h3 style={{fontWeight:800,fontSize:14,color:'var(--navy)'}}>📩 Murojaat qilish</h3>
+                {((post as any).extra?.requiredFields || []).includes('resume') && (
+                  <div>
+                    <label style={{fontSize:12,fontWeight:700,color:'var(--text-secondary)',display:'block',marginBottom:6}}>📄 Rezyume</label>
+                    {applyData.resumeUrl ? (
+                      <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:10,background:'var(--bg)'}}>
+                        <span style={{fontSize:13,fontWeight:600,color:'var(--navy)',flex:1}}>Yuklangan ✓</span>
+                        <label style={{fontSize:12,fontWeight:700,color:'var(--gold)',cursor:'pointer'}}>
+                          O&apos;zgartirish
+                          <input type="file" accept=".pdf,.doc,.docx" style={{display:'none'}} onChange={async (e) => {
+                            const file = e.target.files?.[0]; if (!file) return;
+                            setUploadingResume(true);
+                            try { const res = await api.upload.file(file); setApplyData(p=>({...p,resumeUrl:res.url})); } catch(err:any) { alert(err.message); }
+                            finally { setUploadingResume(false); }
+                          }} />
+                        </label>
+                      </div>
+                    ) : (
+                      <label style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'14px',borderRadius:10,border:'2px dashed rgba(30,58,95,0.2)',cursor:'pointer',background:'var(--bg)',fontSize:13,fontWeight:600,color:'var(--text-muted)'}}>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        {uploadingResume ? 'Yuklanmoqda...' : 'Rezyume yuklash'}
+                        <input type="file" accept=".pdf,.doc,.docx" style={{display:'none'}} disabled={uploadingResume} onChange={async (e) => {
+                          const file = e.target.files?.[0]; if (!file) return;
+                          setUploadingResume(true);
+                          try { const res = await api.upload.file(file); setApplyData(p=>({...p,resumeUrl:res.url})); } catch(err:any) { alert(err.message); }
+                          finally { setUploadingResume(false); }
+                        }} />
+                      </label>
+                    )}
+                  </div>
+                )}
+                {((post as any).extra?.requiredFields || []).includes('portfolio') && (
+                  <div>
+                    <label style={{fontSize:12,fontWeight:700,color:'var(--text-secondary)',display:'block',marginBottom:6}}>🔗 Portfolio</label>
+                    <input className="input" placeholder="https://portfolio.com" value={applyData.portfolio} onChange={e=>setApplyData(p=>({...p,portfolio:e.target.value}))} />
+                  </div>
+                )}
+                {((post as any).extra?.requiredFields || []).includes('message') && (
+                  <div>
+                    <label style={{fontSize:12,fontWeight:700,color:'var(--text-secondary)',display:'block',marginBottom:6}}>💬 Xabar</label>
+                    <textarea className="input" rows={3} placeholder="Motivatsion xat..." value={applyData.message} onChange={e=>setApplyData(p=>({...p,message:e.target.value}))} />
+                  </div>
+                )}
+                {!((post as any).extra?.requiredFields?.length) && (
+                  <div>
+                    <label style={{fontSize:12,fontWeight:700,color:'var(--text-secondary)',display:'block',marginBottom:6}}>💬 Xabar (ixtiyoriy)</label>
+                    <textarea className="input" rows={3} placeholder="Qisqacha o'zingiz haqida..." value={applyData.message} onChange={e=>setApplyData(p=>({...p,message:e.target.value}))} />
+                  </div>
+                )}
+                <div style={{display:'flex',gap:8}}>
+                  <button className="btn" style={{flex:1,background:'var(--bg)',color:'var(--navy)',border:'1px solid var(--border-strong)'}} onClick={() => setShowApply(false)}>Bekor qilish</button>
+                  <button className="btn btn-primary" style={{flex:1}} disabled={applying} onClick={async () => {
+                    setApplying(true);
+                    try {
+                      await api.posts.apply(post.id, applyData);
+                      setApplied(true);
+                    } catch(e:any) { alert(e.message || 'Xatolik'); }
+                    finally { setApplying(false); }
+                  }}>
+                    {applying ? 'Yuborilmoqda...' : 'Yuborish'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {(post as any).isClosed && post.type === 'VACANCY' && (
+          <div className="card" style={{textAlign:'center',padding:'16px',background:'rgba(22,163,74,0.06)',border:'1px solid rgba(22,163,74,0.15)'}}>
+            <p style={{fontWeight:800,fontSize:14,color:'#16a34a'}}>✅ Xodim topildi — vakansiya yopilgan</p>
           </div>
         )}
       </div>

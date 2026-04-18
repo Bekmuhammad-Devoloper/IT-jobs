@@ -90,6 +90,11 @@ export const api = {
         body: JSON.stringify({ fingerprint }),
       }),
     delete: (id: number) => request(`/posts/${id}`, { method: 'DELETE' }),
+    apply: (id: number, data: any) =>
+      request(`/posts/${id}/apply`, { method: 'POST', body: JSON.stringify(data) }),
+    getApplications: (id: number) => request(`/posts/${id}/applications`),
+    close: (id: number) =>
+      request(`/posts/${id}/close`, { method: 'PUT' }),
   },
 
   // ── Services ──────────────────────────────────────

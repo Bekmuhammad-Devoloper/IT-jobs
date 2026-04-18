@@ -212,14 +212,33 @@ export default function ProfilePage() {
                             <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,flexWrap:'wrap'}}>
                               <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(30,58,95,0.06)',color:'var(--navy)'}}>{typeLabels[p.type]||p.type}</span>
                               <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:s.bg,color:s.color}}>{s.label}</span>
+                              {p.isClosed && <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(22,163,74,0.1)',color:'#16a34a'}}>🔒 Yopilgan</span>}
                               <span style={{fontSize:10,color:'var(--text-muted)'}}>{new Date(p.createdAt).toLocaleDateString('uz-UZ')}</span>
                             </div>
                           </div>
-                          {p.status === 'APPROVED' && channelLink && (
-                            <a href={channelLink} target="_blank" rel="noopener noreferrer" style={{fontSize:11,fontWeight:700,padding:'6px 12px',borderRadius:8,background:'var(--navy)',color:'#fff',textDecoration:'none',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:4}}>
-                              📢 Kanalda
-                            </a>
-                          )}
+                          <div style={{display:'flex',gap:4,flexShrink:0}}>
+                            {p.status === 'APPROVED' && channelLink && (
+                              <a href={channelLink} target="_blank" rel="noopener noreferrer" style={{fontSize:10,fontWeight:700,padding:'6px 10px',borderRadius:8,background:'var(--navy)',color:'#fff',textDecoration:'none',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}>
+                                📢 Kanalda
+                              </a>
+                            )}
+                            {p.type === 'VACANCY' && p.status === 'APPROVED' && !p.isClosed && (
+                              <a href={`/posts/${p.id}/applications`} style={{fontSize:10,fontWeight:700,padding:'6px 10px',borderRadius:8,background:'var(--navy-light)',color:'var(--navy)',textDecoration:'none',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}>
+                                👥 Murojaatlar{p.applicationCount > 0 ? ` (${p.applicationCount})` : ''}
+                              </a>
+                            )}
+                            {p.type === 'VACANCY' && p.status === 'APPROVED' && !p.isClosed && (
+                              <button onClick={async () => {
+                                if (!confirm('Vakansiyani yopmoqchimisiz? Bu qaytarib bo\'lmaydi.')) return;
+                                try {
+                                  await api.posts.close(p.id);
+                                  setMyPosts(prev => prev.map(x => x.id === p.id ? {...x, isClosed: true} : x));
+                                } catch(e:any) { alert(e.message || 'Xatolik'); }
+                              }} style={{fontSize:10,fontWeight:700,padding:'6px 10px',borderRadius:8,background:'rgba(220,38,38,0.08)',color:'#dc2626',border:'none',cursor:'pointer',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}>
+                                🔒 Yopish
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );

@@ -64,8 +64,9 @@ model User {
     createdAt         DateTime         @default(now()) @map("created_at")
     updatedAt         DateTime         @updatedAt @map("updated_at")
 
-    posts Post[]
-    views PostView[]
+    posts        Post[]
+    views        PostView[]
+    applications Application[]
 
     @@map("users")
 }
@@ -89,16 +90,34 @@ model Post {
     link            String?
     categoryId      Int?       @map("category_id")
     extra           Json?
+    isClosed        Boolean    @default(false) @map("is_closed")
     viewCount       Int        @default(0) @map("view_count")
     rejectReason    String?    @map("reject_reason")
     createdAt       DateTime   @default(now()) @map("created_at")
     updatedAt       DateTime   @updatedAt @map("updated_at")
 
-    author   User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-    category Category?  @relation(fields: [categoryId], references: [id])
-    views    PostView[]
+    author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    category     Category?     @relation(fields: [categoryId], references: [id])
+    views        PostView[]
+    applications Application[]
 
     @@map("posts")
+}
+
+model Application {
+    id         Int      @id @default(autoincrement())
+    postId     Int      @map("post_id")
+    userId     Int      @map("user_id")
+    message    String?
+    resumeUrl  String?  @map("resume_url")
+    portfolio  String?
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([postId, userId])
+    @@map("applications")
 }
 
 model PostView {

@@ -24,6 +24,7 @@ export default function CreatePage() {
     title:'', description:'', company:'', city:'', salary:'',
     experience:'', workType:'', technologies:'', link:'',
     contactTelegram:'', contactPhone:'', contactEmail:'',
+    requiredFields: [] as string[],
   });
 
   const set = (k: string, v: string) => setF(p => ({...p,[k]:v}));
@@ -32,7 +33,12 @@ export default function CreatePage() {
     if (!f.title.trim()) return;
     setBusy(true);
     try {
-      await api.posts.create({...f, type, technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean)});
+      await api.posts.create({
+        ...f,
+        type,
+        technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean),
+        extra: f.requiredFields.length > 0 ? { requiredFields: f.requiredFields } : undefined,
+      });
       router.push('/posts');
     } catch(e: any) { console.error(e); alert(e.message || "Xatolik yuz berdi"); }
     finally { setBusy(false); }
@@ -132,8 +138,25 @@ export default function CreatePage() {
             <FG label="Texnologiyalar" hint="vergul bilan">
               <input className="input" placeholder="React, Node.js, TypeScript" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
             </FG>
-            <FG label="Havola">
-              <input className="input" placeholder="https://..." value={f.link} onChange={e=>set('link',e.target.value)} />
+            <FG label="Nomzoddan talab qilinadigan ma'lumotlar">
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {[
+                  {v:'resume',l:'📄 Rezyume'},
+                  {v:'portfolio',l:'🔗 Portfolio'},
+                  {v:'message',l:'💬 Xabar (motivatsion xat)'},
+                ].map(opt => (
+                  <label key={opt.v} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',borderRadius:12,background:f.requiredFields.includes(opt.v)?'var(--navy-light)':'var(--bg)',border:f.requiredFields.includes(opt.v)?'2px solid var(--navy)':'2px solid transparent',cursor:'pointer',transition:'all 0.15s'}}>
+                    <input type="checkbox" checked={f.requiredFields.includes(opt.v)} onChange={e => {
+                      if (e.target.checked) setF(p=>({...p,requiredFields:[...p.requiredFields,opt.v]}));
+                      else setF(p=>({...p,requiredFields:p.requiredFields.filter(x=>x!==opt.v)}));
+                    }} style={{display:'none'}} />
+                    <div style={{width:20,height:20,borderRadius:6,border:f.requiredFields.includes(opt.v)?'2px solid var(--navy)':'2px solid var(--border-strong)',background:f.requiredFields.includes(opt.v)?'var(--navy)':'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      {f.requiredFields.includes(opt.v) && <svg width="12" height="12" fill="none" stroke="#fff" strokeWidth="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>}
+                    </div>
+                    <span style={{fontSize:13,fontWeight:600,color:'var(--navy)'}}>{opt.l}</span>
+                  </label>
+                ))}
+              </div>
             </FG>
           </>)}
 

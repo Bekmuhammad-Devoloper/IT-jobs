@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Delete, Body, Param, Query,
+  Controller, Get, Post, Delete, Put, Body, Param, Query,
   UseGuards, ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -62,5 +62,36 @@ export class PostsController {
   @ApiOperation({ summary: 'Delete own post' })
   delete(@CurrentUser() user: any, @Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id, user.id);
+  }
+
+  @Post(':id/apply')
+  @UseGuards(TelegramAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Apply to a vacancy' })
+  apply(
+    @CurrentUser() user: any,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { message?: string; resumeUrl?: string; portfolio?: string },
+  ) {
+    return this.postsService.applyToPost(id, user.id, body);
+  }
+
+  @Get(':id/applications')
+  @UseGuards(TelegramAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get applications for own vacancy' })
+  getApplications(
+    @CurrentUser() user: any,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.postsService.getApplications(id, user.id);
+  }
+
+  @Put(':id/close')
+  @UseGuards(TelegramAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Close own vacancy' })
+  closeVacancy(@CurrentUser() user: any, @Param('id', ParseIntPipe) id: number) {
+    return this.postsService.closeVacancy(id, user.id);
   }
 }

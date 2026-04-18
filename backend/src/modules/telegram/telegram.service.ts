@@ -44,6 +44,16 @@ export class TelegramService {
     }
   }
 
+  async editChannelMessage(messageId: number, text: string) {
+    if (!this.channelId) return null;
+    try {
+      return await this.api.editMessageText(this.channelId, messageId, text, { parse_mode: 'HTML' });
+    } catch (error) {
+      this.logger.error(`Failed to edit channel message ${messageId}: ${error.message}`);
+      return null;
+    }
+  }
+
   async sendPostToChannel(post: any) {
     const channelUsername = this.config.get('CHANNEL_USERNAME', '@Yuksalishdev_ITjobs');
     const webappUrl = this.config.get('WEBAPP_URL', 'https://it-jobs.bekmuhammad.uz');

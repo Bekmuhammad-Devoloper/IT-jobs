@@ -10,6 +10,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { PostFilterDto } from './dto/post-filter.dto';
 import { PostStatus } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +20,7 @@ export class PostsService {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly config: ConfigService,
+    private readonly telegram: TelegramService,
   ) {
     this.cooldownDays = this.config.get<number>('POST_COOLDOWN_DAYS', 15);
   }
@@ -106,7 +108,7 @@ export class PostsService {
   async findOne(id: number) {
     const post = await this.prisma.post.findUnique({
       where: { id },
-      include: { author: true, category: true, _count: { select: { views: true } } },
+      include: { author: true, category: true, _count: { select: { views: true, applications: true } } },
     });
     if (!post) throw new NotFoundException('Post not found');
     return this.serialize(post);
@@ -138,7 +140,7 @@ export class PostsService {
     const [posts, total] = await Promise.all([
       this.prisma.post.findMany({
         where: { authorId: userId },
-        include: { category: true, _count: { select: { views: true } } },
+        include: { category: true, _count: { select: { views: true, applications: true } } },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -161,6 +163,108 @@ export class PostsService {
     return { message: 'Post deleted' };
   }
 
+  async applyToPost(postId: number, userId: number, data: { message?: string; resumeUrl?: string; portfolio?: string }) {
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
+    if (!post) throw new NotFoundException('Post not found');
+    if (post.isClosed) throw new BadRequestException('Bu vakansiya yopilgan');
+    if (post.authorId === userId) throw new BadRequestException("O'z e'loningizga murojaat qila olmaysiz");
+
+    // Check if already applied
+    const existing = await this.prisma.application.findUnique({
+      where: { postId_userId: { postId, userId } },
+    });
+    if (existing) throw new BadRequestException('Siz allaqachon murojaat qilgansiz');
+
+    const app = await this.prisma.application.create({
+      data: {
+        postId,
+        userId,
+        message: data.message,
+        resumeUrl: data.resumeUrl,
+        portfolio: data.portfolio,
+      },
+      include: { user: true },
+    });
+
+    return {
+      ...app,
+      user: {
+        ...app.user,
+        telegramId: app.user.telegramId?.toString(),
+        rating: app.user.rating ? Number(app.user.rating) : 0,
+      },
+    };
+  }
+
+  async getApplications(postId: number, userId: number) {
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
+    if (!post) throw new NotFoundException('Post not found');
+    if (post.authorId !== userId) throw new ForbiddenException('Not your post');
+
+    const applications = await this.prisma.application.findMany({
+      where: { postId },
+      include: { user: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return applications.map((a) => ({
+      ...a,
+      user: {
+        ...a.user,
+        telegramId: a.user.telegramId?.toString(),
+        rating: a.user.rating ? Number(a.user.rating) : 0,
+      },
+    }));
+  }
+
+  async closeVacancy(postId: number, userId: number) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: { author: true },
+    });
+    if (!post) throw new NotFoundException('Post not found');
+    if (post.authorId !== userId) throw new ForbiddenException('Not your post');
+    if (post.isClosed) throw new BadRequestException('Allaqachon yopilgan');
+
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: { isClosed: true },
+    });
+
+    // Edit TG channel message if exists
+    const extra = post.extra as any;
+    if (extra?.channelLink) {
+      // Extract message_id from channel link
+      const parts = extra.channelLink.split('/');
+      const messageId = parseInt(parts[parts.length - 1]);
+      if (messageId) {
+        const channelUsername = this.config.get('CHANNEL_USERNAME', '@Yuksalishdev_ITjobs');
+        const webappUrl = this.config.get('WEBAPP_URL', 'https://it-jobs.bekmuhammad.uz');
+        const detailLink = `${webappUrl}/posts/${post.id}`;
+        const authorName = [post.author?.firstName, post.author?.lastName].filter(Boolean).join(' ') || "Noma'lum";
+        const authorTg = post.author?.username ? `@${post.author.username}` : '';
+
+        const lines: string[] = [
+          `<b>Xodim kerak:</b>`,
+          `<blockquote>✅ Xodim topildi</blockquote>`,
+          '',
+        ];
+        if (post.company) lines.push(`🏢 <b>Idora:</b> ${post.company}`);
+        if (post.technologies?.length) lines.push(`📚 <b>Texnologiya:</b> ${(post.technologies as string[]).join(', ')}`);
+        lines.push(`👷 <b>Mas'ul:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
+        if (post.salary) lines.push(`💰 <b>Maosh:</b> ${post.salary}`);
+        lines.push('');
+        lines.push(`#vakansiya #xodim_topildi`);
+        lines.push('');
+        lines.push(`👉 <a href="${detailLink}">Batafsil ko'rish</a> | ${channelUsername}`);
+
+        await this.telegram.editChannelMessage(messageId, lines.join('\n'));
+      }
+    }
+
+    return { message: 'Vakansiya yopildi' };
+  }
+
   private serialize(post: any) {
     return {
       ...post,
@@ -172,6 +276,7 @@ export class PostsService {
           }
         : undefined,
       viewCount: post._count?.views ?? post.viewCount ?? 0,
+      applicationCount: post._count?.applications ?? 0,
     };
   }
 }
