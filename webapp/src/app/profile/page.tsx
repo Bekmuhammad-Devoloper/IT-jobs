@@ -194,51 +194,80 @@ export default function ProfilePage() {
               ) : myPosts.length === 0 ? (
                 <p style={{fontSize:13,color:'var(--text-muted)',textAlign:'center',padding:16}}>Hali e&apos;lon joylamadingiz</p>
               ) : (
-                <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                <div style={{display:'flex',flexDirection:'column',gap:14}}>
                   {myPosts.map((p: any) => {
-                    const statusColors: Record<string, {bg:string;color:string;label:string}> = {
-                      PENDING: {bg:'rgba(234,179,8,0.12)',color:'#b45309',label:'⏳ Kutilmoqda'},
-                      APPROVED: {bg:'rgba(22,163,74,0.1)',color:'#16a34a',label:'✅ Tasdiqlandi'},
-                      REJECTED: {bg:'rgba(220,38,38,0.1)',color:'#dc2626',label:'❌ Rad etilgan'},
+                    const statusColors: Record<string, {bg:string;color:string;label:string;icon:string}> = {
+                      PENDING: {bg:'rgba(234,179,8,0.12)',color:'#b45309',label:'Kutilmoqda',icon:'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'},
+                      APPROVED: {bg:'rgba(22,163,74,0.1)',color:'#16a34a',label:'Tasdiqlandi',icon:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'},
+                      REJECTED: {bg:'rgba(220,38,38,0.1)',color:'#dc2626',label:'Rad etilgan',icon:'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'},
                     };
                     const s = statusColors[p.status] || statusColors.PENDING;
-                    const typeLabels: Record<string,string> = {VACANCY:'Vakansiya',RESUME:'Rezyume',COURSE:'Kurs',MENTOR:'Mentor',INTERNSHIP:'Stajirovka'};
+                    const typeConfig: Record<string,{label:string;icon:string;bg:string}> = {
+                      VACANCY:{label:'Vakansiya',icon:'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0h2a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h2',bg:'rgba(99,102,241,0.1)'},
+                      RESUME:{label:'Rezyume',icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',bg:'rgba(14,165,233,0.1)'},
+                      COURSE:{label:'Kurs',icon:'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',bg:'rgba(168,85,247,0.1)'},
+                      MENTOR:{label:'Mentor',icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',bg:'rgba(245,158,11,0.1)'},
+                      INTERNSHIP:{label:'Stajirovka',icon:'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',bg:'rgba(16,185,129,0.1)'},
+                    };
+                    const tc = typeConfig[p.type] || {label:p.type,icon:'M4 6h16M4 12h16M4 18h16',bg:'rgba(30,58,95,0.06)'};
                     const channelLink = p.extra?.channelLink;
                     return (
-                      <div key={p.id} style={{padding:'12px 14px',borderRadius:12,background:'var(--bg)',border:'1px solid rgba(30,58,95,0.06)'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                      <div key={p.id} style={{borderRadius:16,background:'#fff',border:'1px solid rgba(30,58,95,0.08)',boxShadow:'0 2px 12px rgba(30,58,95,0.06)',overflow:'hidden'}}>
+                        {/* Header */}
+                        <div style={{padding:'14px 16px',display:'flex',alignItems:'flex-start',gap:12}}>
+                          <div style={{width:42,height:42,borderRadius:12,background:tc.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                            <svg width="20" height="20" fill="none" stroke="var(--navy)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d={tc.icon}/></svg>
+                          </div>
                           <div style={{flex:1,minWidth:0}}>
-                            <div style={{fontSize:14,fontWeight:700,color:'var(--navy)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.title}</div>
-                            <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,flexWrap:'wrap'}}>
-                              <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(30,58,95,0.06)',color:'var(--navy)'}}>{typeLabels[p.type]||p.type}</span>
-                              <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:s.bg,color:s.color}}>{s.label}</span>
-                              {p.isClosed && <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(22,163,74,0.1)',color:'#16a34a'}}>🔒 Yopilgan</span>}
-                              <span style={{fontSize:10,color:'var(--text-muted)'}}>{new Date(p.createdAt).toLocaleDateString('uz-UZ')}</span>
+                            <div style={{fontSize:15,fontWeight:700,color:'var(--navy)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.title}</div>
+                            <div style={{display:'flex',alignItems:'center',gap:6,marginTop:5,flexWrap:'wrap'}}>
+                              <span style={{fontSize:10,fontWeight:700,padding:'3px 8px',borderRadius:6,background:tc.bg,color:'var(--navy)'}}>{tc.label}</span>
+                              <span style={{fontSize:10,fontWeight:700,padding:'3px 8px',borderRadius:6,background:s.bg,color:s.color,display:'flex',alignItems:'center',gap:3}}>
+                                <svg width="10" height="10" fill="none" stroke={s.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d={s.icon}/></svg>
+                                {s.label}
+                              </span>
+                              {p.isClosed && (
+                                <span style={{fontSize:10,fontWeight:700,padding:'3px 8px',borderRadius:6,background:'rgba(107,114,128,0.1)',color:'#6b7280',display:'flex',alignItems:'center',gap:3}}>
+                                  <svg width="10" height="10" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                  Yopilgan
+                                </span>
+                              )}
                             </div>
                           </div>
-                          <div style={{display:'flex',gap:4,flexShrink:0}}>
-                            {p.status === 'APPROVED' && channelLink && (
-                              <a href={channelLink} target="_blank" rel="noopener noreferrer" style={{fontSize:10,fontWeight:700,padding:'6px 10px',borderRadius:8,background:'var(--navy)',color:'#fff',textDecoration:'none',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}>
-                                📢 Kanalda
-                              </a>
-                            )}
-                            {p.type === 'VACANCY' && p.status === 'APPROVED' && !p.isClosed && (
-                              <a href={`/posts/${p.id}/applications`} style={{fontSize:10,fontWeight:700,padding:'6px 10px',borderRadius:8,background:'var(--navy-light)',color:'var(--navy)',textDecoration:'none',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}>
-                                👥 Murojaatlar{p.applicationCount > 0 ? ` (${p.applicationCount})` : ''}
-                              </a>
-                            )}
-                            {p.type === 'VACANCY' && p.status === 'APPROVED' && !p.isClosed && (
-                              <button onClick={async () => {
-                                if (!confirm('Vakansiyani yopmoqchimisiz? Bu qaytarib bo\'lmaydi.')) return;
-                                try {
-                                  await api.posts.close(p.id);
-                                  setMyPosts(prev => prev.map(x => x.id === p.id ? {...x, isClosed: true} : x));
-                                } catch(e:any) { alert(e.message || 'Xatolik'); }
-                              }} style={{fontSize:10,fontWeight:700,padding:'6px 10px',borderRadius:8,background:'rgba(220,38,38,0.08)',color:'#dc2626',border:'none',cursor:'pointer',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}>
-                                🔒 Yopish
-                              </button>
-                            )}
-                          </div>
+                        </div>
+                        {/* Footer actions */}
+                        <div style={{padding:'0 16px 14px',display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+                          <span style={{fontSize:11,color:'var(--text-muted)',display:'flex',alignItems:'center',gap:4}}>
+                            <svg width="12" height="12" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            {new Date(p.createdAt).toLocaleDateString('uz-UZ')}
+                          </span>
+                          <div style={{flex:1}}/>
+                          {p.status === 'APPROVED' && channelLink && (
+                            <a href={channelLink} target="_blank" rel="noopener noreferrer" style={{fontSize:11,fontWeight:700,padding:'7px 12px',borderRadius:10,background:'var(--navy)',color:'#fff',textDecoration:'none',display:'inline-flex',alignItems:'center',gap:5,transition:'opacity .15s'}}
+                              onMouseEnter={e=>(e.currentTarget.style.opacity='0.85')} onMouseLeave={e=>(e.currentTarget.style.opacity='1')}>
+                              <svg width="13" height="13" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                              Kanalda
+                            </a>
+                          )}
+                          {p.type === 'VACANCY' && p.status === 'APPROVED' && !p.isClosed && (
+                            <a href={`/posts/${p.id}/applications`} style={{fontSize:11,fontWeight:700,padding:'7px 12px',borderRadius:10,background:'var(--navy-light)',color:'var(--navy)',textDecoration:'none',display:'inline-flex',alignItems:'center',gap:5}}>
+                              <svg width="13" height="13" fill="none" stroke="var(--navy)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                              Murojaatlar{p.applicationCount > 0 ? ` (${p.applicationCount})` : ''}
+                            </a>
+                          )}
+                          {p.type === 'VACANCY' && p.status === 'APPROVED' && !p.isClosed && (
+                            <button onClick={async () => {
+                              if (!confirm('Vakansiyani yopmoqchimisiz? Bu qaytarib bo\'lmaydi.')) return;
+                              try {
+                                await api.posts.close(p.id);
+                                setMyPosts(prev => prev.map(x => x.id === p.id ? {...x, isClosed: true} : x));
+                              } catch(e:any) { alert(e.message || 'Xatolik'); }
+                            }} style={{fontSize:11,fontWeight:700,padding:'7px 12px',borderRadius:10,background:'rgba(220,38,38,0.06)',color:'#dc2626',border:'1px solid rgba(220,38,38,0.15)',cursor:'pointer',display:'inline-flex',alignItems:'center',gap:5,transition:'background .15s'}}
+                              onMouseEnter={e=>(e.currentTarget.style.background='rgba(220,38,38,0.12)')} onMouseLeave={e=>(e.currentTarget.style.background='rgba(220,38,38,0.06)')}>
+                              <svg width="13" height="13" fill="none" stroke="#dc2626" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                              Yopish
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
