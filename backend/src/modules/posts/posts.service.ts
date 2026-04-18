@@ -72,6 +72,10 @@ export class PostsService {
     } else {
       where.status = PostStatus.APPROVED;
     }
+    // Hide closed posts from public listings
+    if (!status) {
+      where.isClosed = false;
+    }
     if (city) where.city = { contains: city, mode: 'insensitive' };
     if (categoryId) where.categoryId = categoryId;
     if (technology) where.technologies = { has: technology };

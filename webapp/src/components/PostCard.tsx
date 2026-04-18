@@ -40,7 +40,11 @@ export default function PostCard({ post }: { post: Post }) {
           </span>
           {post.author && (
             <div style={{display:'flex',alignItems:'center',gap:6}}>
-              <div style={{width:22,height:22,borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--navy),#2a4f7a)',color:'#fff',fontSize:10,fontWeight:800}}>{post.author.firstName?.[0]||'?'}</div>
+              {post.author.photoUrl || post.author.photo ? (
+                <img src={post.author.photoUrl || post.author.photo} alt="" style={{width:22,height:22,borderRadius:7,objectFit:'cover'}}/>
+              ) : (
+                <div style={{width:22,height:22,borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--navy),#2a4f7a)',color:'#fff',fontSize:10,fontWeight:800}}>{post.author.firstName?.[0]||'?'}</div>
+              )}
               <span style={{fontSize:11,fontWeight:600,color:'var(--text-secondary)'}}>{post.author.firstName}</span>
             </div>
           )}
