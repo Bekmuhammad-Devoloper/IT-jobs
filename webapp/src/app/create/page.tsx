@@ -51,7 +51,7 @@ export default function CreatePage() {
       if (requiredFields.length > 0) clean.extra = { requiredFields };
       await api.posts.create(clean);
       router.push('/posts');
-    } catch(e: any) { console.error(e); alert(e?.message || "Xatolik yuz berdi"); }
+    } catch(e: any) { console.error(e); alert(e?.message || JSON.stringify(e) || "Xatolik yuz berdi"); }
     finally { setBusy(false); }
   }
 
