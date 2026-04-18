@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { TelegramService } from '../telegram/telegram.service';
@@ -10,6 +11,7 @@ export class AdminService {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly telegram: TelegramService,
+    private readonly config: ConfigService,
   ) {}
 
   // ── Users ──────────────────────────────────────────────
@@ -113,9 +115,18 @@ export class AdminService {
       include: { author: true, category: true },
     });
 
-    // Publish to Telegram channel
+    // Publish to Telegram channel and save message link
     try {
-      await this.telegram.sendPostToChannel(post);
+      const msg = await this.telegram.sendPostToChannel(post);
+      if (msg?.message_id) {
+        const channelUsername = this.config.get('CHANNEL_USERNAME', 'Yuksalishdev_ITjobs');
+        const channelLink = `https://t.me/${channelUsername.replace('@', '')}/${msg.message_id}`;
+        await this.prisma.post.update({
+          where: { id },
+          data: { extra: { channelLink } },
+        });
+        (post as any).extra = { channelLink };
+      }
     } catch (e) {
       // Don't fail the approval if channel send fails
     }

@@ -197,21 +197,29 @@ export default function ProfilePage() {
                 <div style={{display:'flex',flexDirection:'column',gap:8}}>
                   {myPosts.map((p: any) => {
                     const statusColors: Record<string, {bg:string;color:string;label:string}> = {
-                      PENDING: {bg:'rgba(234,179,8,0.12)',color:'#b45309',label:'Kutilmoqda'},
-                      APPROVED: {bg:'rgba(22,163,74,0.1)',color:'#16a34a',label:'Tasdiqlangan'},
-                      REJECTED: {bg:'rgba(220,38,38,0.1)',color:'#dc2626',label:'Rad etilgan'},
+                      PENDING: {bg:'rgba(234,179,8,0.12)',color:'#b45309',label:'⏳ Kutilmoqda'},
+                      APPROVED: {bg:'rgba(22,163,74,0.1)',color:'#16a34a',label:'✅ Tasdiqlandi'},
+                      REJECTED: {bg:'rgba(220,38,38,0.1)',color:'#dc2626',label:'❌ Rad etilgan'},
                     };
                     const s = statusColors[p.status] || statusColors.PENDING;
                     const typeLabels: Record<string,string> = {VACANCY:'Vakansiya',RESUME:'Rezyume',COURSE:'Kurs',MENTOR:'Mentor',INTERNSHIP:'Stajirovka'};
+                    const channelLink = p.extra?.channelLink;
                     return (
-                      <div key={p.id} style={{padding:'12px 14px',borderRadius:12,background:'var(--bg)',border:'1px solid rgba(30,58,95,0.06)',display:'flex',alignItems:'center',gap:10}}>
-                        <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontSize:14,fontWeight:700,color:'var(--navy)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.title}</div>
-                          <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,flexWrap:'wrap'}}>
-                            <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(30,58,95,0.06)',color:'var(--navy)'}}>{typeLabels[p.type]||p.type}</span>
-                            <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:s.bg,color:s.color}}>{s.label}</span>
-                            <span style={{fontSize:10,color:'var(--text-muted)'}}>{new Date(p.createdAt).toLocaleDateString('uz-UZ')}</span>
+                      <div key={p.id} style={{padding:'12px 14px',borderRadius:12,background:'var(--bg)',border:'1px solid rgba(30,58,95,0.06)'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontSize:14,fontWeight:700,color:'var(--navy)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.title}</div>
+                            <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4,flexWrap:'wrap'}}>
+                              <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:'rgba(30,58,95,0.06)',color:'var(--navy)'}}>{typeLabels[p.type]||p.type}</span>
+                              <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:6,background:s.bg,color:s.color}}>{s.label}</span>
+                              <span style={{fontSize:10,color:'var(--text-muted)'}}>{new Date(p.createdAt).toLocaleDateString('uz-UZ')}</span>
+                            </div>
                           </div>
+                          {p.status === 'APPROVED' && channelLink && (
+                            <a href={channelLink} target="_blank" rel="noopener noreferrer" style={{fontSize:11,fontWeight:700,padding:'6px 12px',borderRadius:8,background:'var(--navy)',color:'#fff',textDecoration:'none',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:4}}>
+                              📢 Kanalda
+                            </a>
+                          )}
                         </div>
                       </div>
                     );

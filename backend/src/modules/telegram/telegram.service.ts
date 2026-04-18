@@ -26,11 +26,13 @@ export class TelegramService {
   }
 
   async sendToChannel(text: string, parseMode: 'HTML' | 'MarkdownV2' = 'HTML') {
-    if (!this.channelId) return;
+    if (!this.channelId) return null;
     try {
-      await this.api.sendMessage(this.channelId, text, { parse_mode: parseMode });
+      const msg = await this.api.sendMessage(this.channelId, text, { parse_mode: parseMode });
+      return msg;
     } catch (error) {
       this.logger.error(`Failed to send to channel: ${error.message}`);
+      return null;
     }
   }
 
@@ -71,7 +73,8 @@ export class TelegramService {
         text = this.formatDefault(post, authorName, channelUsername, detailLink);
     }
 
-    await this.sendToChannel(text);
+    const msg = await this.sendToChannel(text);
+    return msg; // returns message object with message_id
   }
 
   // ── RESUME ──
@@ -102,25 +105,25 @@ export class TelegramService {
   // ── VACANCY ──
   private formatVacancy(p: any, authorName: string, channel: string, link: string): string {
     const lines: string[] = [
-      `💼 <b>Vakansiya: ${p.title}</b>`,
+      `<b>Xodim kerak:</b>`,
+      '',
     ];
-    if (p.company) lines.push(`🏢 <b>Kompaniya:</b> ${p.company}`);
-    if (p.city) lines.push(`📍 <b>Hudud:</b> ${p.city}`);
+    if (p.company) lines.push(`🏢 <b>Idora:</b> ${p.company}`);
+    if (p.technologies?.length) lines.push(`📚 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
+    if (p.contactTelegram) lines.push(`🇺🇿 <b>Telegram:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 <b>Aloqa:</b> ${p.contactPhone}`);
+    if (p.city) lines.push(`🌐 <b>Hudud:</b> ${p.city}`);
+    lines.push(`👷 <b>Mas'ul:</b> ${authorName}`);
+    if (p.link) lines.push(`🕰 <b>Murojaat vaqti:</b> ${p.link}`);
+    if (p.workType) lines.push(`🕐 <b>Ish vaqti:</b> ${p.workType}`);
     if (p.salary) lines.push(`💰 <b>Maosh:</b> ${p.salary}`);
-    if (p.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience}`);
-    if (p.workType) lines.push(`� <b>Ish turi:</b> ${p.workType}`);
-    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
     if (p.description) {
-      lines.push('');
-      lines.push(p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description);
+      lines.push(`‼️ <b>Qo'shimcha:</b> ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
     }
     lines.push('');
-    if (p.contactTelegram) lines.push(`📩 <b>Aloqa:</b> ${p.contactTelegram}`);
-    if (p.contactPhone) lines.push(`📞 ${p.contactPhone}`);
+    lines.push(`#ishJoyi ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`#vakansiya ${this.buildHashtags(p)}`);
-    lines.push('');
-    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`👉 ${channel} kanaliga ulanish`);
     return lines.join('\n');
   }
 
