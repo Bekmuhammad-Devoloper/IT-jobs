@@ -96,7 +96,7 @@ export default function CreatePage() {
           </FG>
           {type !== 'RESUME' && (
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-              <FG label="Kompaniya"><input className="input" placeholder="Kompaniya" value={f.company} onChange={e=>set('company',e.target.value)} /></FG>
+              <FG label={type === 'COURSE' ? "O'quv markaz" : "Kompaniya"}><input className="input" placeholder={type === 'COURSE' ? "O'quv markaz nomi" : "Kompaniya"} value={f.company} onChange={e=>set('company',e.target.value)} /></FG>
               <FG label="Shahar"><input className="input" placeholder="Toshkent" value={f.city} onChange={e=>set('city',e.target.value)} /></FG>
             </div>
           )}
@@ -104,10 +104,10 @@ export default function CreatePage() {
             <FG label="Shahar"><input className="input" placeholder="Toshkent" value={f.city} onChange={e=>set('city',e.target.value)} /></FG>
           )}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <FG label="Maosh"><input className="input" placeholder="1000 - 2000 $" value={f.salary} onChange={e=>set('salary',e.target.value)} /></FG>
+            <FG label={type === 'COURSE' ? "Kurs narxi" : "Maosh"}><input className="input" placeholder={type === 'COURSE' ? "100 000 so'm" : "1000 - 2000 $"} value={f.salary} onChange={e=>set('salary',e.target.value)} /></FG>
             <FG label="Tajriba"><input className="input" placeholder="3+ yil" value={f.experience} onChange={e=>set('experience',e.target.value)} /></FG>
           </div>
-          <FG label={type === 'VACANCY' ? "Ish formati" : "Ish turi"}>
+          <FG label={type === 'VACANCY' ? "Ish formati" : type === 'COURSE' ? "Kurs formati" : "Ish turi"}>
             <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
               {WORKS.map(w => (
                 <button key={w} type="button" onClick={() => set('workType',w)}
@@ -120,8 +120,8 @@ export default function CreatePage() {
           <FG label="Texnologiyalar" hint="vergul bilan">
             <input className="input" placeholder="React, Node.js, TypeScript" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
           </FG>
-          <FG label={type === 'RESUME' ? "Murojaat qilish vaqti" : "Havola"}>
-            <input className="input" placeholder={type === 'RESUME' ? "5:00 16:00" : "https://..."} value={f.link} onChange={e=>set('link',e.target.value)} />
+          <FG label={type === 'RESUME' || type === 'COURSE' ? "Murojaat qilish vaqti" : "Havola"}>
+            <input className="input" placeholder={type === 'RESUME' || type === 'COURSE' ? "8:00 - 22:00" : "https://..."} value={f.link} onChange={e=>set('link',e.target.value)} />
           </FG>
 
           <div className="divider" />
