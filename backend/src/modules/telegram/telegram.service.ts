@@ -113,7 +113,8 @@ export class TelegramService {
     if (p.contactTelegram) lines.push(`🇺🇿 <b>Telegram:</b> ${p.contactTelegram}`);
     if (p.contactPhone) lines.push(`📞 <b>Aloqa:</b> ${p.contactPhone}`);
     if (p.city) lines.push(`🌐 <b>Hudud:</b> ${p.city}`);
-    lines.push(`👷 <b>Mas'ul:</b> ${authorName}`);
+    const authorTg = p.author?.username ? `@${p.author.username}` : (p.contactTelegram || '');
+    lines.push(`👷 <b>Mas'ul:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
     if (p.link) lines.push(`🕰 <b>Murojaat vaqti:</b> ${p.link}`);
     if (p.workType) lines.push(`🕐 <b>Ish vaqti:</b> ${p.workType}`);
     if (p.salary) lines.push(`💰 <b>Maosh:</b> ${p.salary}`);
@@ -121,9 +122,9 @@ export class TelegramService {
       lines.push(`‼️ <b>Qo'shimcha:</b> ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
     }
     lines.push('');
-    lines.push(`#ishJoyi ${this.buildHashtags(p)}`);
+    lines.push(`#vakansiya ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`👉 ${channel} kanaliga ulanish`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
