@@ -198,7 +198,7 @@ export class TelegramService {
       '',
     ];
     if (p.title) lines.push(`🎯 <b>Kurs nomi:</b> ${p.title}`);
-👨‍🏫 <b>Ustoz:</b> ${authorName}`);
+    lines.push(`👨‍🏫 <b>Ustoz:</b> ${authorName}`);
     if (p.author?.age) lines.push(`🕒 <b>Yosh:</b> ${p.author.age}`);
     if (p.technologies?.length) lines.push(`🛠 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
     if (p.contactTelegram) lines.push(`📩 <b>Telegram:</b> ${p.contactTelegram}`);
