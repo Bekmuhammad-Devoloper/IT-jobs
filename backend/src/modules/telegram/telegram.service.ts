@@ -25,10 +25,10 @@ export class TelegramService {
     }
   }
 
-  async sendToChannel(text: string, parseMode: 'HTML' | 'MarkdownV2' = 'HTML') {
+  async sendToChannel(text: string, parseMode: 'HTML' | 'MarkdownV2' = 'HTML', options?: any) {
     if (!this.channelId) return null;
     try {
-      const msg = await this.api.sendMessage(this.channelId, text, { parse_mode: parseMode });
+      const msg = await this.api.sendMessage(this.channelId, text, { parse_mode: parseMode, ...options });
       return msg;
     } catch (error) {
       this.logger.error(`Failed to send to channel: ${error.message}`);
@@ -44,10 +44,10 @@ export class TelegramService {
     }
   }
 
-  async editChannelMessage(messageId: number, text: string) {
+  async editChannelMessage(messageId: number, text: string, options?: any) {
     if (!this.channelId) return null;
     try {
-      return await this.api.editMessageText(this.channelId, messageId, text, { parse_mode: 'HTML' });
+      return await this.api.editMessageText(this.channelId, messageId, text, { parse_mode: 'HTML', ...options });
     } catch (error) {
       this.logger.error(`Failed to edit channel message ${messageId}: ${error.message}`);
       return null;
@@ -83,7 +83,10 @@ export class TelegramService {
         text = this.formatDefault(post, authorName, channelUsername, detailLink);
     }
 
-    const msg = await this.sendToChannel(text);
+    const reply_markup = {
+      inline_keyboard: [[{ text: '👉 Batafsil ko\'rish', web_app: { url: detailLink } }]],
+    };
+    const msg = await this.sendToChannel(text, 'HTML', { reply_markup });
     return msg; // returns message object with message_id
   }
 
@@ -108,7 +111,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#xodim ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`� <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`${channel}`);
     return lines.join('\n');
   }
 
@@ -134,7 +137,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#vakansiya ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`${channel}`);
     return lines.join('\n');
   }
 
@@ -159,7 +162,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#mentor ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`${channel}`);
     return lines.join('\n');
   }
 
@@ -184,7 +187,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#stajirovka ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`${channel}`);
     return lines.join('\n');
   }
 
@@ -208,7 +211,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#kurs ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`${channel}`);
     return lines.join('\n');
   }
 
@@ -220,7 +223,7 @@ export class TelegramService {
     ];
     if (p.description) lines.push(p.description.length > 300 ? p.description.substring(0, 300) + '...' : p.description);
     lines.push('');
-    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
+    lines.push(`${channel}`);
     return lines.join('\n');
   }
 
