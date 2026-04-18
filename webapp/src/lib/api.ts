@@ -18,15 +18,17 @@ async function request<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const initData = getInitData();
-  const authHeader = initData.startsWith('token:')
-    ? { Authorization: `Bearer ${initData.slice(6)}` }
-    : initData ? { Authorization: `tma ${initData}` } : {};
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (initData.startsWith('token:')) {
+    headers['Authorization'] = `Bearer ${initData.slice(6)}`;
+  } else if (initData) {
+    headers['Authorization'] = `tma ${initData}`;
+  }
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...authHeader,
+      ...headers,
       ...options.headers,
     },
   });
