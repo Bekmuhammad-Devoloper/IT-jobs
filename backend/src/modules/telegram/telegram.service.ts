@@ -88,7 +88,6 @@ export class TelegramService {
     };
     const msg = await this.sendToChannel(text, 'HTML', {
       reply_markup,
-      link_preview_options: { is_disabled: true },
     });
     return msg; // returns message object with message_id
   }
