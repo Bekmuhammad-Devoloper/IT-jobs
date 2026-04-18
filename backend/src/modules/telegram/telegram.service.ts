@@ -146,7 +146,7 @@ export class TelegramService {
       `👨‍🏫 <b>Mentor: ${authorName}</b>`,
     ];
     if (p.title && p.title !== authorName) lines.push(`📌 <b>${p.title}</b>`);
-    if (p.author?.profession) lines.push(`� <b>Kasbi:</b> ${p.author.profession}`);
+    if (p.author?.profession) lines.push(`👨‍💻 <b>Kasbi:</b> ${p.author.profession}`);
     if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
     if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
     if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
@@ -198,8 +198,8 @@ export class TelegramService {
       '',
     ];
     if (p.title) lines.push(`🎯 <b>Kurs nomi:</b> ${p.title}`);
-    lines.push(`�‍🏫 <b>Ustoz:</b> ${authorName}`);
-    if (p.author?.age) lines.push(`� <b>Yosh:</b> ${p.author.age}`);
+👨‍🏫 <b>Ustoz:</b> ${authorName}`);
+    if (p.author?.age) lines.push(`🕒 <b>Yosh:</b> ${p.author.age}`);
     if (p.technologies?.length) lines.push(`🛠 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
     if (p.contactTelegram) lines.push(`📩 <b>Telegram:</b> ${p.contactTelegram}`);
     if (p.contactPhone) lines.push(`📞 <b>Aloqa:</b> ${p.contactPhone}`);
@@ -207,10 +207,10 @@ export class TelegramService {
     if (p.company) lines.push(`🏫 <b>O'quv markaz:</b> ${p.company}`);
     if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
     if (p.workType) lines.push(`🕐 <b>Format:</b> ${p.workType}`);
-    if (p.experience) lines.push(`� <b>Tajriba:</b> ${p.experience}`);
+    if (p.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience}`);
     if (p.link) lines.push(`🕰 <b>Murojaat qilish vaqti:</b> ${p.link}`);
     if (p.description) {
-      lines.push(`� <b>Maqsad:</b> ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
+      lines.push(`🔎 <b>Maqsad:</b> ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
     }
     lines.push('');
     lines.push(`#kurs ${this.buildHashtags(p)}`);
