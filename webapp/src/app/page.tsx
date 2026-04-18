@@ -21,7 +21,10 @@ export default function HomePage() {
       api.posts.getAll({ limit: '5', sort: 'createdAt', order: 'desc' }).catch(() => null),
     ]).then(([s, p]: any) => {
       if (s) setStats(s.data || s);
-      if (p) setPosts((p.data || p)?.data || []);
+      if (p) {
+        const raw = p.data || p;
+        setPosts(Array.isArray(raw) ? raw : raw?.data || []);
+      }
     }).finally(() => setLoading(false));
   }, []);
 

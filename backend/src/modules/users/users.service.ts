@@ -9,7 +9,20 @@ export class UsersService {
   async getProfile(userId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
-    return this.serialize(user);
+
+    const [postsCount, viewsCount] = await Promise.all([
+      this.prisma.post.count({ where: { authorId: userId } }),
+      this.prisma.post.aggregate({
+        where: { authorId: userId },
+        _sum: { viewCount: true },
+      }),
+    ]);
+
+    return {
+      ...this.serialize(user),
+      postsCount,
+      viewsCount: viewsCount._sum.viewCount || 0,
+    };
   }
 
   async updateProfile(userId: number, dto: UpdateProfileDto) {

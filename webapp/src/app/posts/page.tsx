@@ -37,8 +37,8 @@ function Content() {
       if (search) params.q = search;
       const res: any = await api.posts.getAll(params);
       const d = res.data || res;
-      setPosts(d.data || []);
-      setTP(d.meta?.totalPages || 1);
+      setPosts(Array.isArray(d) ? d : d?.data || []);
+      setTP(d?.meta?.totalPages || res?.meta?.totalPages || 1);
     } catch(e) { console.error(e); }
     finally { setLoading(false); }
   }
