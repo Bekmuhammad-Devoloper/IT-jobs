@@ -84,7 +84,7 @@ export class TelegramService {
     }
 
     const reply_markup = {
-      inline_keyboard: [[{ text: '👉 Batafsil ko\'rish', web_app: { url: detailLink } }]],
+      inline_keyboard: [[{ text: '👉 Batafsil ko\'rish', url: detailLink }]],
     };
     const msg = await this.sendToChannel(text, 'HTML', {
       reply_markup,
