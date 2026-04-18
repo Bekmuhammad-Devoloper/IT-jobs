@@ -83,12 +83,7 @@ export class TelegramService {
         text = this.formatDefault(post, authorName, channelUsername, detailLink);
     }
 
-    const reply_markup = {
-      inline_keyboard: [[{ text: '👉 Batafsil ko\'rish', url: detailLink }]],
-    };
-    const msg = await this.sendToChannel(text, 'HTML', {
-      reply_markup,
-    });
+    const msg = await this.sendToChannel(text);
     return msg; // returns message object with message_id
   }
 
@@ -113,7 +108,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#xodim ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`${channel}`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
@@ -139,7 +134,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#vakansiya ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`${channel}`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
@@ -164,7 +159,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#mentor ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`${channel}`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
@@ -189,7 +184,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#stajirovka ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`${channel}`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
@@ -213,7 +208,7 @@ export class TelegramService {
     lines.push('');
     lines.push(`#kurs ${this.buildHashtags(p)}`);
     lines.push('');
-    lines.push(`${channel}`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
@@ -225,7 +220,7 @@ export class TelegramService {
     ];
     if (p.description) lines.push(p.description.length > 300 ? p.description.substring(0, 300) + '...' : p.description);
     lines.push('');
-    lines.push(`${channel}`);
+    lines.push(`👉 <a href="${link}">Batafsil ko'rish</a> | ${channel}`);
     return lines.join('\n');
   }
 
