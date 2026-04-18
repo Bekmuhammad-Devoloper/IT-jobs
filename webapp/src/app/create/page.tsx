@@ -34,8 +34,18 @@ export default function CreatePage() {
     setBusy(true);
     try {
       await api.posts.create({
-        ...f,
         type,
+        title: f.title,
+        description: f.description,
+        company: f.company,
+        city: f.city,
+        salary: f.salary,
+        experience: f.experience,
+        workType: f.workType,
+        link: f.link,
+        contactTelegram: f.contactTelegram,
+        contactPhone: f.contactPhone,
+        contactEmail: f.contactEmail,
         technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean),
         extra: f.requiredFields.length > 0 ? { requiredFields: f.requiredFields } : undefined,
       });
