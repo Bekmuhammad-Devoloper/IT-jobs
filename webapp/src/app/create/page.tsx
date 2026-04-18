@@ -35,14 +35,23 @@ export default function CreatePage() {
     if (!f.title.trim()) return;
     setBusy(true);
     try {
-      await api.posts.create({
-        ...f,
-        type,
-        technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean),
-        extra: requiredFields.length > 0 ? { requiredFields } : undefined,
-      });
+      const clean: any = { title: f.title, type };
+      if (f.description.trim()) clean.description = f.description;
+      if (f.company.trim()) clean.company = f.company;
+      if (f.city.trim()) clean.city = f.city;
+      if (f.salary.trim()) clean.salary = f.salary;
+      if (f.experience.trim()) clean.experience = f.experience;
+      if (f.workType) clean.workType = f.workType;
+      if (f.link.trim()) clean.link = f.link;
+      if (f.contactTelegram.trim()) clean.contactTelegram = f.contactTelegram;
+      if (f.contactPhone.trim()) clean.contactPhone = f.contactPhone;
+      if (f.contactEmail.trim()) clean.contactEmail = f.contactEmail;
+      const techs = f.technologies.split(',').map(t=>t.trim()).filter(Boolean);
+      if (techs.length) clean.technologies = techs;
+      if (requiredFields.length > 0) clean.extra = { requiredFields };
+      await api.posts.create(clean);
       router.push('/posts');
-    } catch(e) { console.error(e); alert("Xatolik yuz berdi"); }
+    } catch(e: any) { console.error(e); alert(e?.message || "Xatolik yuz berdi"); }
     finally { setBusy(false); }
   }
 
