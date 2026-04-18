@@ -83,7 +83,7 @@ export default function ProfilePage() {
   // Priority: store user > Telegram data > form data > fallback
   const displayName = user?.firstName || tgFirstName || f.firstName || 'Foydalanuvchi';
   const displayLastName = user?.lastName || tgLastName || f.lastName || '';
-  const photoUrl = tgPhotoUrl;
+  const photoUrl = tgPhotoUrl || user?.photoUrl || profile?.photoUrl;
 
   return (
     <div style={{paddingBottom:100,minHeight:'100dvh'}}>
