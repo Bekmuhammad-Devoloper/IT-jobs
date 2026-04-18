@@ -3,8 +3,12 @@ const API_URL = typeof window !== 'undefined'
   : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'); // server-side
 
 function getInitData(): string {
-  if (typeof window !== 'undefined' && window.Telegram?.WebApp?.initData) {
-    return window.Telegram.WebApp.initData;
+  if (typeof window !== 'undefined') {
+    if (window.Telegram?.WebApp?.initData) {
+      return window.Telegram.WebApp.initData;
+    }
+    const token = localStorage.getItem('token');
+    if (token) return `token:${token}`;
   }
   return '';
 }
@@ -14,12 +18,15 @@ async function request<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const initData = getInitData();
+  const authHeader = initData.startsWith('token:')
+    ? { Authorization: `Bearer ${initData.slice(6)}` }
+    : initData ? { Authorization: `tma ${initData}` } : {};
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(initData ? { Authorization: `tma ${initData}` } : {}),
+      ...authHeader,
       ...options.headers,
     },
   });

@@ -67,8 +67,26 @@ export const useAppStore = create<AppState>((set, get) => ({
             }
           })();
         } else {
-          console.log('[Yuksalish] No initData, skipping auth');
-          set({ isLoading: false });
+          console.log('[Yuksalish] No initData, trying saved token');
+          const savedToken = localStorage.getItem('token');
+          if (savedToken) {
+            (async () => {
+              try {
+                set({ isLoading: true });
+                const result: any = await api.auth.me();
+                const user = result.data?.user || result.user || result.data || result;
+                console.log('[Yuksalish] Token auth success, user:', user?.firstName);
+                set({ user, isAuthenticated: true });
+              } catch (e: any) {
+                console.error('[Yuksalish] Token auth failed:', e.message);
+                localStorage.removeItem('token');
+              } finally {
+                set({ isLoading: false });
+              }
+            })();
+          } else {
+            set({ isLoading: false });
+          }
         }
       } else if (attempt < 50) {
         // Script may still be loading — retry every 100ms, up to ~5 seconds

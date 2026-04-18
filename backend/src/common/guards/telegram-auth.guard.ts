@@ -1,5 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { createHmac } from 'crypto';
 import { PrismaService } from '../../modules/prisma/prisma.service';
 
@@ -8,6 +9,7 @@ export class TelegramAuthGuard implements CanActivate {
   constructor(
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -18,8 +20,34 @@ export class TelegramAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization header missing');
     }
 
-    const token = authHeader.replace(/^(Bearer |tma )/i, '');
+    // JWT Bearer token auth
+    if (authHeader.startsWith('Bearer ')) {
+      return this.validateJwt(request, authHeader.replace('Bearer ', ''));
+    }
 
+    // Telegram initData auth
+    const token = authHeader.replace(/^tma /i, '');
+    return this.validateTelegramInitData(request, token);
+  }
+
+  private async validateJwt(request: any, token: string): Promise<boolean> {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_SECRET', 'yuksalish-secret'),
+      });
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub || payload.userId },
+      });
+      if (!user) throw new UnauthorizedException('User not found');
+      request.user = user;
+      return true;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) throw error;
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  private async validateTelegramInitData(request: any, token: string): Promise<boolean> {
     try {
       const initData = new URLSearchParams(token);
       const hash = initData.get('hash');
