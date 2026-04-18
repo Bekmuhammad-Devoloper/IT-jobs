@@ -90,8 +90,10 @@ export class TelegramService {
   // ── RESUME ──
   private formatResume(p: any, authorName: string, channel: string, link: string): string {
     const lines: string[] = [
-      `👨‍💼 <b>Xodim: ${authorName}</b>`,
+      `<b>Ish joyi kerak:</b>`,
+      '',
     ];
+    lines.push(`👨‍💼 <b>Xodim:</b> ${authorName}`);
     if (p.author?.age) lines.push(`🕑 <b>Yosh:</b> ${p.author.age}`);
     if (p.technologies?.length) lines.push(`📚 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
     if (p.contactTelegram) lines.push(`🇺🇿 <b>Telegram:</b> ${p.contactTelegram}`);
@@ -101,8 +103,8 @@ export class TelegramService {
     if (p.author?.profession) lines.push(`👨🏻‍💻 <b>Kasbi:</b> ${p.author.profession}`);
     if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
     if (p.workType) lines.push(`🕰 <b>Ish turi:</b> ${p.workType}`);
+    if (p.link) lines.push(`🕐 <b>Murojaat qilish vaqti:</b> ${p.link}`);
     if (p.description) {
-      lines.push('');
       lines.push(`🔎 <b>Maqsad:</b> ${p.description}`);
     }
     lines.push('');
