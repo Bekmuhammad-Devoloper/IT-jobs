@@ -32,9 +32,7 @@ export class TelegramAuthGuard implements CanActivate {
 
   private async validateJwt(request: any, token: string): Promise<boolean> {
     try {
-      const payload = this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET', 'yuksalish-secret'),
-      });
+      const payload = this.jwtService.verify(token);
       const user = await this.prisma.user.findUnique({
         where: { id: payload.sub || payload.userId },
       });
