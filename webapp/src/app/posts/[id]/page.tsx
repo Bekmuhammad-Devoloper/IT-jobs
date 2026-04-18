@@ -107,16 +107,21 @@ export default function PostDetailPage() {
               <svg width="15" height="15" fill="none" stroke="var(--navy)" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0114 0"/></svg>
               Muallif
             </h3>
-            <div style={{display:'flex',alignItems:'center',gap:14}}>
-              <div style={{width:48,height:48,borderRadius:16,display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--navy),#2a4f7a)',color:'#fff',fontSize:20,fontWeight:800,flexShrink:0}}>
-                {post.author.firstName?.[0] || '?'}
-              </div>
+            <a href={post.author.username ? `https://t.me/${post.author.username}` : '#'} target="_blank" rel="noopener noreferrer" style={{display:'flex',alignItems:'center',gap:14,textDecoration:'none',color:'inherit'}}>
+              {post.author.photoUrl ? (
+                <img src={post.author.photoUrl} alt={post.author.firstName || ''} style={{width:48,height:48,borderRadius:16,objectFit:'cover',flexShrink:0}} />
+              ) : (
+                <div style={{width:48,height:48,borderRadius:16,display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--navy),#2a4f7a)',color:'#fff',fontSize:20,fontWeight:800,flexShrink:0}}>
+                  {post.author.firstName?.[0] || '?'}
+                </div>
+              )}
               <div style={{flex:1}}>
                 <p style={{fontWeight:700,fontSize:14}}>{post.author.firstName} {post.author.lastName || ''}</p>
+                {post.author.username && <p style={{fontSize:12,color:'var(--text-muted)',marginTop:2}}>@{post.author.username}</p>}
                 {post.author.profession && <p style={{fontSize:12,color:'var(--text-muted)',marginTop:2}}>{post.author.profession}</p>}
               </div>
               {post.author.rating > 0 && <span style={{fontSize:12,fontWeight:800,padding:'6px 14px',borderRadius:10,background:'var(--gold-light)',color:'var(--gold-dark)'}}>&#9733; {post.author.rating}</span>}
-            </div>
+            </a>
           </div>
         )}
       </div>
