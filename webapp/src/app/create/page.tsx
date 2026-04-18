@@ -39,7 +39,6 @@ export default function CreatePage() {
         ...f,
         type,
         technologies: f.technologies.split(',').map(t=>t.trim()).filter(Boolean),
-        telegramId: user?.id,
         extra: requiredFields.length > 0 ? { requiredFields } : undefined,
       });
       router.push('/posts');
