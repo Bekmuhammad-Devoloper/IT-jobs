@@ -121,7 +121,7 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
             padding: m ? '6px 12px' : '8px 16px', borderRadius: m ? 12 : 16,
             marginBottom: m ? 10 : 12, width: 'fit-content',
           }}>
-            <DollarSign size={m ? 14 : 16} strokeWidth={2} /> {post.salary}
+            <DollarSign size={m ? 14 : 16} strokeWidth={2} /> {Number(post.salary).toLocaleString('ru-RU')}
           </div>
         )}
 
