@@ -2,8 +2,12 @@
 import type { Post } from '@/types';
 import { getPostTypeLabel, getPostTypeColor, timeAgo, truncate } from '@/lib/utils';
 import Link from 'next/link';
+import CourseCard from './CourseCard';
+import VacancyCard from './VacancyCard';
 
-export default function PostCard({ post }: { post: Post }) {
+export default function PostCard({ post, index }: { post: Post; index?: number }) {
+  if (post.type === 'COURSE') return <CourseCard post={post} index={index} />;
+  if (post.type === 'VACANCY') return <VacancyCard post={post} index={index} />;
   if (post.type === 'RESUME') return <ResumeCard post={post} />;
   return <DefaultCard post={post} />;
 }
