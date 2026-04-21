@@ -112,20 +112,19 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
         </div>
 
         {/* 4. NARX PILL */}
-        {post.salary && (
-            <div style={{
-              fontSize: m ? 15 : 16, fontWeight: 700,
-              padding: m ? '6px 12px' : '8px 16px', borderRadius: m ? 12 : 16,
-              marginBottom: m ? 10 : 12, width: 'fit-content',
-              background: 'linear-gradient(135deg, hsla(38, 92%, 88%, 1), hsla(38, 92%, 80%, 1))',
-              border: '1px solid hsla(38, 80%, 70%, 0.6)', color: 'hsl(28, 80%, 35%)',
-              display: 'inline-flex', alignItems: 'center', gap: m ? 4 : 6,
-            }}>
-              <DollarSign size={m ? 14 : 16} strokeWidth={2} />{' '}
-              {post.salary && !isNaN(Number(post.salary)) && Number(post.salary) > 0
-                ? Number(post.salary).toLocaleString('ru-RU')
-                : 'Kelishiladi'}
-            </div>
+        <div style={{
+          fontSize: m ? 15 : 16, fontWeight: 700,
+          padding: m ? '6px 12px' : '8px 16px', borderRadius: m ? 12 : 16,
+          marginBottom: m ? 10 : 12, width: 'fit-content',
+          background: 'linear-gradient(135deg, hsla(38, 92%, 88%, 1), hsla(38, 92%, 80%, 1))',
+          border: '1px solid hsla(38, 80%, 70%, 0.6)', color: 'hsl(28, 80%, 35%)',
+          display: 'inline-flex', alignItems: 'center', gap: m ? 4 : 6,
+        }}>
+          <DollarSign size={m ? 14 : 16} strokeWidth={2} />{' '}
+          {post.salary && !isNaN(Number(post.salary)) && Number(post.salary) > 0
+            ? Number(post.salary).toLocaleString('ru-RU')
+            : 'Kelishiladi'}
+        </div>
 
         {/* 5. SKILL TEGLAR */}
         {techs.length > 0 && (
