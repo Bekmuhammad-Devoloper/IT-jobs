@@ -143,13 +143,13 @@ export class TelegramService {
   // ── MENTOR ──
   private formatMentor(p: any, authorName: string, channel: string, link: string): string {
     const lines: string[] = [
-      `� <b>Shogird kerak:</b>`,
+      `\u{1F393} <b>Shogird kerak:</b>`,
       '',
       '',
     ];
-    if (p.author?.profession) lines.push(`�‍💻 <b>Mutaxassisligi:</b> ${p.author.profession}`);
-    lines.push(`👨‍🏫 <b>Mentor:</b> ${authorName}`);
-    if (p.title && p.title !== authorName) lines.push(`📌 <b>${p.title}</b>`);
+    if (p.author?.profession) lines.push(`\u{1F468}\u200D\u{1F4BB} <b>Mutaxassisligi:</b> ${p.author.profession}`);
+    lines.push(`\u{1F468}\u200D\u{1F3EB} <b>Mentor:</b> ${authorName}`);
+    if (p.title && p.title !== authorName) lines.push(`\u{1F4CC} <b>${p.title}</b>`);
     if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
     if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
     if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
