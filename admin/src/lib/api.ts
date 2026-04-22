@@ -1,5 +1,5 @@
 const API_URL = typeof window !== 'undefined'
-  ? '/api'  // browser: nginx proxies /api to backend
+  ? '/admin/api'  // browser: hits admin's Next.js server, which rewrites /admin/api/* to backend
   : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'); // server-side
 
 function getToken(): string {
