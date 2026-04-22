@@ -83,17 +83,18 @@ export class PostsService {
       ];
     }
 
+    const defaultOrderBy: any[] = [
+      { rating: 'desc' },
+      { createdAt: 'desc' },
+    ];
+
     const [posts, total] = await Promise.all([
       this.prisma.post.findMany({
         where,
         include: { author: true, category: true, _count: { select: { views: true } } },
         orderBy: sort
           ? [{ [sort]: order || 'desc' }]
-          : [
-              { pinnedOrder: { sort: 'asc', nulls: 'last' } },
-              { rating: 'desc' },
-              { createdAt: 'desc' },
-            ],
+          : defaultOrderBy,
         skip,
         take: limit || 20,
       }),
