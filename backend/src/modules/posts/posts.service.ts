@@ -87,7 +87,13 @@ export class PostsService {
       this.prisma.post.findMany({
         where,
         include: { author: true, category: true, _count: { select: { views: true } } },
-        orderBy: { [sort || 'createdAt']: order || 'desc' },
+        orderBy: sort
+          ? [{ [sort]: order || 'desc' }]
+          : [
+              { pinnedOrder: { sort: 'asc', nulls: 'last' } },
+              { rating: 'desc' },
+              { createdAt: 'desc' },
+            ],
         skip,
         take: limit || 20,
       }),

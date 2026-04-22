@@ -70,6 +70,10 @@ export const adminApi = {
       return request(`/admin/posts${qs}`);
     },
     delete: (id: number) => request(`/admin/posts/${id}`, { method: 'DELETE' }),
+    updateRating: (id: number, rating: number) =>
+      request(`/admin/posts/${id}/rating`, { method: 'PATCH', body: JSON.stringify({ rating }) }),
+    updateOrder: (id: number, pinnedOrder: number | null) =>
+      request(`/admin/posts/${id}/order`, { method: 'PATCH', body: JSON.stringify({ pinnedOrder }) }),
   },
 
   moderation: {

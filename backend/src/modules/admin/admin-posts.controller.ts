@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Delete, Param, Query, UseGuards, ParseIntPipe,
+  Controller, Get, Delete, Patch, Param, Query, Body, UseGuards, ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
@@ -22,6 +22,24 @@ export class AdminPostsController {
     @Query('type') type?: string,
   ) {
     return this.adminService.getPosts(page || 1, limit || 20, status, type);
+  }
+
+  @Patch(':id/rating')
+  @ApiOperation({ summary: 'Update post rating (admin)' })
+  updateRating(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('rating') rating: number,
+  ) {
+    return this.adminService.updatePostRating(id, rating);
+  }
+
+  @Patch(':id/order')
+  @ApiOperation({ summary: 'Update post pinned order (admin)' })
+  updateOrder(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('pinnedOrder') pinnedOrder: number | null,
+  ) {
+    return this.adminService.updatePostOrder(id, pinnedOrder ?? null);
   }
 
   @Delete(':id')

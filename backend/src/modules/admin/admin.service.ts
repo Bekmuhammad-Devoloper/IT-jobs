@@ -104,6 +104,24 @@ export class AdminService {
     return { message: 'Post deleted' };
   }
 
+  async updatePostRating(id: number, rating: number) {
+    const post = await this.prisma.post.update({
+      where: { id },
+      data: { rating },
+      include: { author: true },
+    });
+    return this.serializePost(post);
+  }
+
+  async updatePostOrder(id: number, pinnedOrder: number | null) {
+    const post = await this.prisma.post.update({
+      where: { id },
+      data: { pinnedOrder },
+      include: { author: true },
+    });
+    return this.serializePost(post);
+  }
+
   // ── Moderation ──────────────────────────────────────────
 
   async getPendingPosts(page = 1, limit = 20) {
