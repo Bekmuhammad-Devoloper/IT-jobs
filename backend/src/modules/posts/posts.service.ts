@@ -84,6 +84,7 @@ export class PostsService {
     }
 
     const defaultOrderBy: any[] = [
+      { pinnedOrder: { sort: 'asc', nulls: 'last' } },
       { rating: 'desc' },
       { createdAt: 'desc' },
     ];
