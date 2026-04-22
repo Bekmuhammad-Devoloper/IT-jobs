@@ -102,8 +102,18 @@ export class PostsService {
       this.prisma.post.count({ where }),
     ]);
 
+    const sorted = sort ? posts : [...posts].sort((a, b) => {
+      const aPin = a.pinnedOrder ?? 999999;
+      const bPin = b.pinnedOrder ?? 999999;
+      if (aPin !== bPin) return aPin - bPin;
+      const aRating = Number(a.rating) || 0;
+      const bRating = Number(b.rating) || 0;
+      if (bRating !== aRating) return bRating - aRating;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
     return {
-      data: posts.map(this.serialize),
+      data: sorted.map(this.serialize),
       meta: {
         total,
         page: page || 1,
