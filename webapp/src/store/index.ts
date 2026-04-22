@@ -25,79 +25,55 @@ export const useAppStore = create<AppState>((set, get) => ({
   _initDone: false,
 
   initTelegram: () => {
-    // Prevent double init
     if (get()._initDone) return;
-    set({ _initDone: true });
+    set({ _initDone: true, isLoading: true });
 
-    console.log('[Yuksalish] initTelegram called');
+    const waitForSdk = (): Promise<any> => new Promise((resolve) => {
+      let attempt = 0;
+      const tick = () => {
+        const tg = typeof window !== 'undefined' ? window.Telegram?.WebApp : null;
+        if (tg) return resolve(tg);
+        if (++attempt >= 50) return resolve(null);
+        setTimeout(tick, 100);
+      };
+      tick();
+    });
 
-    const tryInit = (attempt = 0) => {
-      const tgAvailable = typeof window !== 'undefined' && window.Telegram?.WebApp;
-      console.log(`[Yuksalish] tryInit attempt=${attempt}, tgAvailable=${!!tgAvailable}`);
+    (async () => {
+      try {
+        const tg = await waitForSdk();
+        if (tg) {
+          tg.ready();
+          tg.expand();
+          set({ telegram: tg });
 
-      if (tgAvailable) {
-        const tg = window.Telegram!.WebApp;
-        console.log('[Yuksalish] Telegram WebApp found, initData length:', tg.initData?.length);
-        console.log('[Yuksalish] initDataUnsafe user:', JSON.stringify(tg.initDataUnsafe?.user));
-        tg.ready();
-        tg.expand();
-        set({ telegram: tg });
-        // Authenticate with initData directly (don't rely on get().telegram)
-        const initData = tg.initData;
-        if (initData) {
-          console.log('[Yuksalish] Calling authenticate with initData length:', initData.length);
-          (async () => {
-            try {
-              set({ isLoading: true, error: null });
-              console.log('[Yuksalish] Sending POST /api/auth/telegram...');
-              const result: any = await api.auth.telegram(initData);
-              console.log('[Yuksalish] Auth response:', JSON.stringify(result).substring(0, 200));
-              const user = result.data?.user || result.user;
-              const token = result.data?.token || result.token;
-              if (token) {
-                localStorage.setItem('token', token);
-              }
-              console.log('[Yuksalish] Auth success, user:', user?.firstName);
-              set({ user, isAuthenticated: true });
-            } catch (error: any) {
-              console.error('[Yuksalish] Auth error:', error.message);
-              set({ error: error.message });
-            } finally {
-              set({ isLoading: false });
-            }
-          })();
-        } else {
-          console.log('[Yuksalish] No initData, trying saved token');
-          const savedToken = localStorage.getItem('token');
-          if (savedToken) {
-            (async () => {
-              try {
-                set({ isLoading: true });
-                const result: any = await api.auth.me();
-                const user = result.data?.user || result.user || result.data || result;
-                console.log('[Yuksalish] Token auth success, user:', user?.firstName);
-                set({ user, isAuthenticated: true });
-              } catch (e: any) {
-                console.error('[Yuksalish] Token auth failed:', e.message);
-                localStorage.removeItem('token');
-              } finally {
-                set({ isLoading: false });
-              }
-            })();
-          } else {
-            set({ isLoading: false });
+          if (tg.initData) {
+            const result: any = await api.auth.telegram(tg.initData);
+            const user = result.data?.user || result.user;
+            const token = result.data?.token || result.token;
+            if (token) localStorage.setItem('token', token);
+            set({ user, isAuthenticated: !!user });
+            return;
           }
         }
-      } else if (attempt < 50) {
-        // Script may still be loading — retry every 100ms, up to ~5 seconds
-        setTimeout(() => tryInit(attempt + 1), 100);
-      } else {
-        // Not inside Telegram after retries — stop loading
-        console.log('[Yuksalish] Not in Telegram context after 50 attempts');
+
+        const savedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        if (savedToken) {
+          try {
+            const result: any = await api.auth.me();
+            const user = result.data?.user || result.user || result.data || result;
+            set({ user, isAuthenticated: !!user });
+          } catch (e: any) {
+            localStorage.removeItem('token');
+            set({ error: e?.message || null });
+          }
+        }
+      } catch (error: any) {
+        set({ error: error?.message || 'Auth failed' });
+      } finally {
         set({ isLoading: false });
       }
-    };
-    tryInit();
+    })();
   },
 
   authenticate: async () => {

@@ -72,27 +72,31 @@ export default function ModerationPage() {
   }
 
   async function handleApprove(id: number) {
+    if (actionLoading !== null) return;
     setActionLoading(id);
     try {
       await adminApi.moderation.approve(id);
       setPosts((prev) => prev.filter((p) => p.id !== id));
       if (expanded === id) setExpanded(null);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(e?.message || "Tasdiqlashda xatolik yuz berdi");
     } finally {
       setActionLoading(null);
     }
   }
 
   async function handleReject(id: number) {
+    if (actionLoading !== null) return;
     const reason = prompt('Rad etish sababi (ixtiyoriy):');
     setActionLoading(id);
     try {
       await adminApi.moderation.reject(id, reason || undefined);
       setPosts((prev) => prev.filter((p) => p.id !== id));
       if (expanded === id) setExpanded(null);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(e?.message || "Rad etishda xatolik yuz berdi");
     } finally {
       setActionLoading(null);
     }

@@ -64,29 +64,45 @@ export default function AdminUsersPage() {
     loadUsers();
   }
 
+  const [actionUserId, setActionUserId] = useState<number | null>(null);
+
   async function toggleBlock(user: UserItem) {
+    if (actionUserId) return;
+    const action = user.isBlocked ? 'blokdan chiqarmoqchimisiz' : 'bloklamoqchimisiz';
+    if (!confirm(`${user.firstName} ${user.lastName || ''}ni ${action}?`)) return;
+    setActionUserId(user.id);
+    const original = user.isBlocked;
+    setUsers((prev) =>
+      prev.map((u) => (u.id === user.id ? { ...u, isBlocked: !u.isBlocked } : u)),
+    );
     try {
-      if (user.isBlocked) {
+      if (original) {
         await adminApi.users.unblock(user.id);
       } else {
         await adminApi.users.block(user.id);
       }
-      setUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? { ...u, isBlocked: !u.isBlocked } : u)),
-      );
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(e?.message || "Amalni bajarib bo'lmadi");
+      setUsers((prev) =>
+        prev.map((u) => (u.id === user.id ? { ...u, isBlocked: original } : u)),
+      );
+    } finally {
+      setActionUserId(null);
     }
   }
 
-  async function changeRole(userId: number, role: string) {
+  async function changeRole(userId: number, role: string, currentRole: string) {
+    if (role === currentRole) return;
+    if (!confirm(`Rolni ${currentRole} → ${role}ga o'zgartirmoqchimisiz?`)) return;
     try {
       await adminApi.users.setRole(userId, role);
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role } : u)),
       );
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(e?.message || "Rolni o'zgartirib bo'lmadi (ruxsat yo'q bo'lishi mumkin)");
     }
   }
 
@@ -179,7 +195,7 @@ export default function AdminUsersPage() {
                     <td>
                       <select className="admin-input role-select" title="Rol"
                         value={user.role}
-                        onChange={(e) => changeRole(user.id, e.target.value)}>
+                        onChange={(e) => changeRole(user.id, e.target.value, user.role)}>
                         <option value="USER">User</option>
                         <option value="ADMIN">Admin</option>
                         <option value="SUPERADMIN">Superadmin</option>
@@ -215,6 +231,7 @@ export default function AdminUsersPage() {
                         </Link>
                         <button
                           className={`btn btn-sm ${user.isBlocked ? 'btn-success' : 'btn-danger'}`}
+                          disabled={actionUserId === user.id}
                           onClick={() => toggleBlock(user)}
                           title={user.isBlocked ? 'Blokdan chiqarish' : 'Bloklash'}
                         >

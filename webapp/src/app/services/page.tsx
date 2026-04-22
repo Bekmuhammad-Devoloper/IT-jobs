@@ -181,17 +181,21 @@ export default function ServicesPage() {
 
   async function sendToTelegram() {
     setSending(true);
+    const support = (process.env.NEXT_PUBLIC_SUPPORT_TG || 'itjobs_support').replace('@', '');
+    const supportUrl = `https://t.me/${support}`;
+    let copied = false;
     try {
-      // Send resume text to backend which forwards to TG support
-      const msg = `📋 *YANGI RESUME BUYURTMA*\n\n${generatedResume}`;
-      // For now, copy to clipboard and redirect to TG
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(generatedResume);
+        copied = true;
       }
-      window.open(`https://t.me/itjobs_support?text=${encodeURIComponent('📋 Resume buyurtma yubordim. Tekshirib ko\'ring!')}`, '_blank');
+      window.open(`${supportUrl}?text=${encodeURIComponent('📋 Resume buyurtma yubordim. Tekshirib ko\'ring!')}`, '_blank');
       setSent(true);
+      if (!copied) {
+        alert("Resume matnini avtomatik nusxalab bo'lmadi — qo'lda ko'chiring.");
+      }
     } catch {
-      window.open('https://t.me/itjobs_support', '_blank');
+      window.open(supportUrl, '_blank');
     }
     setSending(false);
   }
@@ -434,7 +438,7 @@ export default function ServicesPage() {
           <div style={{ position: 'relative', zIndex: 2 }}>
             <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Maxsus xizmat kerakmi?</p>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 20 }}>Biz bilan bog&apos;laning</p>
-            <a href="https://t.me/Khamidov_onine" target="_blank" rel="noopener noreferrer"
+            <a href={`https://t.me/${(process.env.NEXT_PUBLIC_CONTACT_TG || 'Khamidov_onine').replace('@','')}`} target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', borderRadius: 10, background: 'var(--gold)', color: '#fff', fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 4px 12px rgba(184,160,106,0.3)' }}>
               <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 5L2 12.5l7 1M21 5l-4 15-7-8.5M21 5l-12 8.5" /></svg>
               Telegram orqali yozish

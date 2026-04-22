@@ -86,9 +86,9 @@ export const api = {
 
   // ── Posts ──────────────────────────────────────────
   posts: {
-    getAll: (params?: Record<string, string>) => {
+    getAll: (params?: Record<string, string>, signal?: AbortSignal) => {
       const qs = params ? '?' + new URLSearchParams(params).toString() : '';
-      return request(`/posts${qs}`);
+      return request(`/posts${qs}`, signal ? { signal } : {});
     },
     getOne: (id: number) => request(`/posts/${id}`),
     create: (data: any) =>

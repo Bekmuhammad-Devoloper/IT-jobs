@@ -26,16 +26,17 @@ export class PostsService {
   }
 
   async create(userId: number, dto: CreatePostDto) {
-    // Check cooldown — only for RESUME type
+    const cooldownKey = `cooldown:${userId}:${dto.type}`;
+
     if (dto.type === 'RESUME') {
-      const cooldownKey = `cooldown:${userId}:${dto.type}`;
-      const hasCooldown = await this.redis.exists(cooldownKey);
-      if (hasCooldown) {
-        const ttl = await this.redis.getClient().ttl(cooldownKey);
-        const days = Math.ceil(ttl / 86400);
-        throw new BadRequestException(
-          `Siz ${dto.type} turi uchun ${days} kun kutishingiz kerak`,
-        );
+      const ttl = await this.redis.getClient().ttl(cooldownKey);
+      if (ttl > 0) {
+        const hours = Math.ceil(ttl / 3600);
+        const msg =
+          hours >= 24
+            ? `Siz ${dto.type} turi uchun yana ${Math.ceil(hours / 24)} kun kutishingiz kerak`
+            : `Siz ${dto.type} turi uchun yana ${hours} soat kutishingiz kerak`;
+        throw new BadRequestException(msg);
       }
     }
 
@@ -48,13 +49,8 @@ export class PostsService {
       include: { author: true, category: true },
     });
 
-    // Set cooldown — only for RESUME type
     if (dto.type === 'RESUME') {
-      await this.redis.set(
-        `cooldown:${userId}:${dto.type}`,
-        '1',
-        this.cooldownDays * 24 * 60 * 60,
-      );
+      await this.redis.set(cooldownKey, '1', this.cooldownDays * 24 * 60 * 60);
     }
 
     return this.serialize(post);
@@ -122,20 +118,21 @@ export class PostsService {
     const identifier = userId ? `user:${userId}` : `fp:${fingerprint}`;
     const viewKey = `view:${postId}:${identifier}`;
 
-    const alreadyViewed = await this.redis.exists(viewKey);
-    if (alreadyViewed) return;
+    const acquired = await this.redis.setNx(viewKey, '1', 86400);
+    if (!acquired) return;
 
-    await this.prisma.postView.create({
-      data: { postId, userId, fingerprint },
-    });
-
-    await this.prisma.post.update({
-      where: { id: postId },
-      data: { viewCount: { increment: 1 } },
-    });
-
-    // Cache view for 24 hours to prevent duplicate counts
-    await this.redis.set(viewKey, '1', 86400);
+    try {
+      await this.prisma.postView.create({
+        data: { postId, userId, fingerprint },
+      });
+      await this.prisma.post.update({
+        where: { id: postId },
+        data: { viewCount: { increment: 1 } },
+      });
+    } catch (e) {
+      await this.redis.del(viewKey);
+      throw e;
+    }
   }
 
   async getUserPosts(userId: number, page = 1, limit = 20) {
@@ -170,25 +167,28 @@ export class PostsService {
   async applyToPost(postId: number, userId: number, data: { message?: string; resumeUrl?: string; portfolio?: string }) {
     const post = await this.prisma.post.findUnique({ where: { id: postId } });
     if (!post) throw new NotFoundException('Post not found');
+    if (post.status !== PostStatus.APPROVED) throw new BadRequestException("Bu e'lon hali tasdiqlanmagan");
     if (post.isClosed) throw new BadRequestException('Bu vakansiya yopilgan');
     if (post.authorId === userId) throw new BadRequestException("O'z e'loningizga murojaat qila olmaysiz");
 
-    // Check if already applied
-    const existing = await this.prisma.application.findUnique({
-      where: { postId_userId: { postId, userId } },
-    });
-    if (existing) throw new BadRequestException('Siz allaqachon murojaat qilgansiz');
-
-    const app = await this.prisma.application.create({
-      data: {
-        postId,
-        userId,
-        message: data.message,
-        resumeUrl: data.resumeUrl,
-        portfolio: data.portfolio,
-      },
-      include: { user: true },
-    });
+    let app;
+    try {
+      app = await this.prisma.application.create({
+        data: {
+          postId,
+          userId,
+          message: data.message,
+          resumeUrl: data.resumeUrl,
+          portfolio: data.portfolio,
+        },
+        include: { user: true },
+      });
+    } catch (e: any) {
+      if (e?.code === 'P2002') {
+        throw new BadRequestException('Siz allaqachon murojaat qilgansiz');
+      }
+      throw e;
+    }
 
     return {
       ...app,
@@ -240,8 +240,8 @@ export class PostsService {
     if (extra?.channelLink) {
       // Extract message_id from channel link
       const parts = extra.channelLink.split('/');
-      const messageId = parseInt(parts[parts.length - 1]);
-      if (messageId) {
+      const messageId = parseInt(parts[parts.length - 1], 10);
+      if (Number.isFinite(messageId) && messageId > 0) {
         const channelUsername = this.config.get('CHANNEL_USERNAME', '@Yuksalishdev_ITjobs');
         const webappUrl = this.config.get('WEBAPP_URL', 'https://it-jobs.bekmuhammad.uz');
         const detailLink = `${webappUrl}/posts/${post.id}`;

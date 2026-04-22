@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
@@ -7,6 +7,8 @@ import { PostStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
@@ -109,13 +111,20 @@ export class AdminService {
   }
 
   async approvePost(id: number) {
-    const post = await this.prisma.post.update({
-      where: { id },
+    const { count } = await this.prisma.post.updateMany({
+      where: { id, status: PostStatus.PENDING },
       data: { status: PostStatus.APPROVED },
+    });
+    if (count === 0) {
+      throw new BadRequestException("E'lon topilmadi yoki allaqachon qayta ko'rilgan");
+    }
+
+    const post = await this.prisma.post.findUnique({
+      where: { id },
       include: { author: true, category: true },
     });
+    if (!post) throw new NotFoundException("E'lon topilmadi");
 
-    // Publish to Telegram channel and save message link
     try {
       const msg = await this.telegram.sendPostToChannel(post);
       if (msg?.message_id) {
@@ -128,7 +137,7 @@ export class AdminService {
         (post as any).extra = { channelLink };
       }
     } catch (e) {
-      // Don't fail the approval if channel send fails
+      this.logger.error(`Channel post failed for post ${id}`, e instanceof Error ? e.stack : e);
     }
 
     return this.serializePost(post);

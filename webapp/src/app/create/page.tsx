@@ -31,8 +31,15 @@ export default function CreatePage() {
   const toggleRequired = (field: string) =>
     setRequiredFields(prev => prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]);
 
+  const hasContact = !!(f.contactTelegram.trim() || f.contactPhone.trim() || f.contactEmail.trim());
+
   async function submit() {
+    if (busy) return;
     if (!f.title.trim()) return;
+    if (!hasContact) {
+      alert("Kamida bitta aloqa usuli (Telegram, Telefon yoki Email) kiriting");
+      return;
+    }
     setBusy(true);
     try {
       const clean: any = { title: f.title, type };
@@ -152,7 +159,7 @@ export default function CreatePage() {
             </>
           )}
 
-          <button className="btn btn-primary" style={{width:'100%',marginTop:8}} disabled={!f.title.trim()||busy} onClick={submit}>
+          <button className="btn btn-primary" style={{width:'100%',marginTop:8}} disabled={!f.title.trim()||!hasContact||busy} onClick={submit}>
             {busy ? 'Yuklanmoqda...' : "E'lonni joylash"}
           </button>
         </div>

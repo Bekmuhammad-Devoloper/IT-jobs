@@ -5,7 +5,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname, join, resolve, basename } from 'path';
 import { existsSync } from 'fs';
 import { Response } from 'express';
 import { v4 as uuid } from 'uuid';
@@ -55,9 +55,15 @@ export class UploadController {
   @Get(':filename')
   @ApiOperation({ summary: 'Get uploaded file' })
   getFile(@Param('filename') filename: string, @Res() res: Response) {
-    // Sanitize filename
-    const safe = filename.replace(/[^a-zA-Z0-9._-]/g, '');
-    const filePath = join(UPLOAD_DIR, safe);
+    const safe = basename(filename).replace(/[^a-zA-Z0-9._-]/g, '');
+    if (!safe || safe === '.' || safe === '..' || safe.startsWith('.')) {
+      return res.status(400).json({ message: 'Invalid filename' });
+    }
+    const baseDir = resolve(UPLOAD_DIR);
+    const filePath = resolve(baseDir, safe);
+    if (!filePath.startsWith(baseDir + require('path').sep)) {
+      return res.status(400).json({ message: 'Invalid filename' });
+    }
     if (!existsSync(filePath)) {
       return res.status(404).json({ message: 'File not found' });
     }

@@ -65,13 +65,20 @@ export default function AdminPostsPage() {
     }
   }
 
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
   async function handleDelete(id: number) {
+    if (deletingId) return;
     if (!confirm("Rostdan o'chirmoqchimisiz?")) return;
+    setDeletingId(id);
     try {
       await adminApi.posts.delete(id);
       setPosts((prev) => prev.filter((p) => p.id !== id));
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(e?.message || "O'chirishda xatolik yuz berdi");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -183,7 +190,7 @@ export default function AdminPostsPage() {
                       {new Date(post.createdAt).toLocaleDateString('uz-UZ')}
                     </td>
                     <td>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(post.id)} title="O'chirish">
+                      <button className="btn btn-danger btn-sm" disabled={deletingId === post.id} onClick={() => handleDelete(post.id)} title="O'chirish">
                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                           <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                           <path d="M19 6l-.9 12.1A2 2 0 0116.1 20H7.9a2 2 0 01-2-1.9L5 6" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.06"/>

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { Post } from '@/types';
@@ -17,6 +17,7 @@ export default function PostDetailPage() {
   const [showApply, setShowApply] = useState(false);
   const [applyData, setApplyData] = useState({ message: '', resumeUrl: '', portfolio: '' });
   const [applying, setApplying] = useState(false);
+  const applyingRef = useRef(false);
   const [applied, setApplied] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
 
@@ -199,12 +200,14 @@ export default function PostDetailPage() {
                 <div style={{display:'flex',gap:8}}>
                   <button className="btn" style={{flex:1,background:'var(--bg)',color:'var(--navy)',border:'1px solid var(--border-strong)'}} onClick={() => setShowApply(false)}>Bekor qilish</button>
                   <button className="btn btn-primary" style={{flex:1}} disabled={applying} onClick={async () => {
+                    if (applyingRef.current) return;
+                    applyingRef.current = true;
                     setApplying(true);
                     try {
                       await api.posts.apply(post.id, applyData);
                       setApplied(true);
                     } catch(e:any) { alert(e.message || 'Xatolik'); }
-                    finally { setApplying(false); }
+                    finally { setApplying(false); applyingRef.current = false; }
                   }}>
                     {applying ? 'Yuborilmoqda...' : 'Yuborish'}
                   </button>

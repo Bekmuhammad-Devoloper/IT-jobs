@@ -32,8 +32,12 @@ export async function handleHelp(ctx: Context) {
 }
 
 export async function handleStats(ctx: Context) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const response = await fetch(`${config.apiUrl}/statistics`);
+    const response = await fetch(`${config.apiUrl}/statistics`, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const stats: any = await response.json();
     const d = stats.data || stats;
 
@@ -48,7 +52,9 @@ export async function handleStats(ctx: Context) {
       `🎓 Stajirovkalar: <b>${d.byType?.internships || 0}</b>`,
       { parse_mode: 'HTML' },
     );
-  } catch {
+  } catch (e: any) {
+    clearTimeout(timer);
+    console.error('[bot] stats error:', e?.message);
     await ctx.reply('⚠️ Statistikani olishda xatolik. Keyinroq urinib ko\'ring.');
   }
 }

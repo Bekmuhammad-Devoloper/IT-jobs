@@ -71,14 +71,33 @@ export class RatingService {
   }
 
   async recalculateAllRatings() {
-    const users = await this.prisma.user.findMany({ select: { id: true } });
+    const users = await this.prisma.user.findMany({
+      include: { posts: { where: { status: 'APPROVED' }, select: { viewCount: true } } },
+    });
     let updated = 0;
 
     for (const user of users) {
       try {
-        await this.calculateUserRating(user.id);
+        let score = 0;
+        if (user.profileCompleted) score += this.WEIGHTS.profileCompleted;
+        if (user.bio) score += this.WEIGHTS.hasBio;
+        if (user.portfolio) score += this.WEIGHTS.hasPortfolio;
+        if (user.github) score += this.WEIGHTS.hasGithub;
+        score += Math.min((user.technologies?.length || 0) * this.WEIGHTS.techCount, 20);
+        score += Math.min(user.posts.length * this.WEIGHTS.postCount, 30);
+        const totalViews = user.posts.reduce((sum, p) => sum + (p.viewCount || 0), 0);
+        score += Math.min(totalViews * this.WEIGHTS.viewCount, 10);
+        const months = Math.floor(
+          (Date.now() - user.createdAt.getTime()) / (30 * 24 * 60 * 60 * 1000),
+        );
+        score += Math.min(months * this.WEIGHTS.accountAge, 6);
+        const rating = Math.min(Math.round(score), 100);
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { rating: new Decimal(rating) },
+        });
         updated++;
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error(`Failed to calc rating for user ${user.id}: ${err.message}`);
       }
     }

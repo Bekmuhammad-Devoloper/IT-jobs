@@ -22,9 +22,9 @@ export default function ProfilePage() {
   const [tgLastName, setTgLastName] = useState<string|null>(null);
   const [tgUsername, setTgUsername] = useState<string|null>(null);
 
-  // Read Telegram user data - retry until SDK loads
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
     const readTg = (attempt = 0) => {
       if (cancelled) return;
       const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -34,11 +34,11 @@ export default function ProfilePage() {
         setTgPhotoUrl(u.photo_url || null);
         setTgUsername(u.username || null);
       } else if (attempt < 30) {
-        setTimeout(() => readTg(attempt + 1), 100);
+        timer = setTimeout(() => readTg(attempt + 1), 100);
       }
     };
     readTg();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; if (timer) clearTimeout(timer); };
   }, []);
 
   // Fetch profile when user is authenticated from store

@@ -36,11 +36,13 @@ export class TelegramService {
     }
   }
 
-  async sendNotification(chatId: number | string, text: string) {
+  async sendNotification(chatId: number | string, text: string): Promise<boolean> {
     try {
       await this.api.sendMessage(chatId, text, { parse_mode: 'HTML' });
-    } catch (error) {
+      return true;
+    } catch (error: any) {
       this.logger.error(`Failed to send notification to ${chatId}: ${error.message}`);
+      return false;
     }
   }
 
