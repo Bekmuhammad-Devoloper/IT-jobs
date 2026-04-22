@@ -137,9 +137,9 @@ export default function AdminPostsPage() {
             onKeyDown={(e) => { if (e.key === 'Enter') saveRating(postId, editingRating.val); if (e.key === 'Escape') setEditingRating(null); }}
           />
           <button onClick={() => saveRating(postId, editingRating.val)} disabled={savingId === postId}
-            style={{ background: '#b8a06a', color: '#fff', border: 'none', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>вњ“</button>
+            style={{ background: '#b8a06a', color: '#fff', border: 'none', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>&#10003;</button>
           <button onClick={() => setEditingRating(null)}
-            style={{ background: 'transparent', color: '#8896ab', border: '1px solid #e2e8f0', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13 }}>вњ•</button>
+            style={{ background: 'transparent', color: '#8896ab', border: '1px solid #e2e8f0', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13 }}>&#10005;</button>
         </div>
       );
     }
@@ -167,16 +167,16 @@ export default function AdminPostsPage() {
     if (editingOrder?.id === postId) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <input type="number" min="1" placeholder="вЂ”" value={editingOrder.val}
+          <input type="number" min="1" placeholder="&#8212;" value={editingOrder.val}
             onChange={(e) => setEditingOrder({ id: postId, val: e.target.value })}
             style={{ width: 52, padding: '2px 6px', border: '1.5px solid #1e3a5f', borderRadius: 6, fontSize: 13, textAlign: 'center' }}
             autoFocus
             onKeyDown={(e) => { if (e.key === 'Enter') saveOrder(postId, editingOrder.val); if (e.key === 'Escape') setEditingOrder(null); }}
           />
           <button onClick={() => saveOrder(postId, editingOrder.val)} disabled={savingId === postId}
-            style={{ background: '#1e3a5f', color: '#fff', border: 'none', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>вњ“</button>
+            style={{ background: '#1e3a5f', color: '#fff', border: 'none', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>&#10003;</button>
           <button onClick={() => setEditingOrder(null)}
-            style={{ background: 'transparent', color: '#8896ab', border: '1px solid #e2e8f0', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13 }}>вњ•</button>
+            style={{ background: 'transparent', color: '#8896ab', border: '1px solid #e2e8f0', borderRadius: 5, padding: '2px 8px', cursor: 'pointer', fontSize: 13 }}>&#10005;</button>
         </div>
       );
     }
@@ -185,7 +185,7 @@ export default function AdminPostsPage() {
         onClick={() => setEditingOrder({ id: postId, val: order != null ? String(order) : '' })} title="Bosib o'zgartiring">
         {order != null
           ? <span style={{ fontWeight: 700, fontSize: 13, color: '#1e3a5f', background: 'rgba(30,58,95,0.09)', borderRadius: 5, padding: '2px 9px' }}>#{order}</span>
-          : <span style={{ fontSize: 12, color: '#8896ab' }}>вЂ”</span>
+          : <span style={{ fontSize: 12, color: '#8896ab' }}>&#8212;</span>
         }
         <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#8896ab" strokeWidth="2.2" style={{ opacity: 0.7 }}>
           <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" strokeLinecap="round" strokeLinejoin="round"/>
