@@ -239,7 +239,7 @@ export default function AdminPostsPage() {
       </div>
 
       <div style={{ fontSize: 12, color: '#8896ab', marginBottom: 10, paddingLeft: 2 }}>
-        рџ’Ў <b>Reyting</b> va <b>O&apos;rin</b> ustunidagi qiymatga bosib o&apos;zgartiring. O&apos;rin belgilangan e&apos;lonlar birinchi ko&apos;rinadi.
+        &#128161; <b>Reyting</b> va <b>O&apos;rin</b> ustunidagi qiymatga bosib o&apos;zgartiring. O&apos;rin belgilangan e&apos;lonlar birinchi ko&apos;rinadi.
       </div>
 
       <div className="admin-card">
@@ -259,8 +259,8 @@ export default function AdminPostsPage() {
                   <th>Tur</th>
                   <th>Sarlavha</th>
                   <th>Holat</th>
-                  <th>в­ђ Reyting</th>
-                  <th>рџ“Њ O&apos;rin</th>
+                  <th>Reyting</th>
+                  <th>O&apos;rin</th>
                   <th>Ko&apos;rishlar</th>
                   <th>Muallif</th>
                   <th>Sana</th>
