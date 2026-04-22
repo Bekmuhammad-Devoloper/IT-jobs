@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [f, setF] = useState({firstName:'',lastName:'',profession:'',bio:'',skills:'',city:'',github:'',linkedin:'',portfolio:'',contactPhone:'',resumeUrl:''});
   const [myPosts, setMyPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [showAllPosts, setShowAllPosts] = useState(false);
 
   // Telegram user data via state (not render-time read, to handle SDK load timing)
   const [tgPhotoUrl, setTgPhotoUrl] = useState<string|null>(null);
@@ -195,7 +196,7 @@ export default function ProfilePage() {
                 <p style={{fontSize:13,color:'var(--text-muted)',textAlign:'center',padding:16}}>Hali e&apos;lon joylamadingiz</p>
               ) : (
                 <div style={{display:'flex',flexDirection:'column',gap:14}}>
-                  {myPosts.map((p: any) => {
+                  {(showAllPosts ? myPosts : myPosts.slice(0, 3)).map((p: any) => {
                     const statusColors: Record<string, {bg:string;color:string;label:string;icon:string}> = {
                       PENDING: {bg:'rgba(234,179,8,0.12)',color:'#b45309',label:'Kutilmoqda',icon:'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'},
                       APPROVED: {bg:'rgba(22,163,74,0.1)',color:'#16a34a',label:'Tasdiqlandi',icon:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'},
@@ -272,6 +273,20 @@ export default function ProfilePage() {
                       </div>
                     );
                   })}
+                  {!showAllPosts && myPosts.length > 3 && (
+                    <button type="button" onClick={() => setShowAllPosts(true)} style={{marginTop:4,padding:'10px 14px',borderRadius:12,background:'var(--navy-light)',color:'var(--navy)',border:'none',fontSize:13,fontWeight:700,cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:6,transition:'background .15s'}}
+                      onMouseEnter={e=>(e.currentTarget.style.background='rgba(30,58,95,0.12)')} onMouseLeave={e=>(e.currentTarget.style.background='var(--navy-light)')}>
+                      Barchasi ({myPosts.length})
+                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                  )}
+                  {showAllPosts && myPosts.length > 3 && (
+                    <button type="button" onClick={() => setShowAllPosts(false)} style={{marginTop:4,padding:'10px 14px',borderRadius:12,background:'var(--navy-light)',color:'var(--navy)',border:'none',fontSize:13,fontWeight:700,cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:6,transition:'background .15s'}}
+                      onMouseEnter={e=>(e.currentTarget.style.background='rgba(30,58,95,0.12)')} onMouseLeave={e=>(e.currentTarget.style.background='var(--navy-light)')}>
+                      Kamroq ko'rsatish
+                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
