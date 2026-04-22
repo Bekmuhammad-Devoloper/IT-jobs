@@ -9,6 +9,7 @@ export default function PostCard({ post, index }: { post: Post; index?: number }
   if (post.type === 'COURSE') return <CourseCard post={post} index={index} />;
   if (post.type === 'VACANCY') return <VacancyCard post={post} index={index} />;
   if (post.type === 'RESUME') return <ResumeCard post={post} />;
+  if (post.type === 'INTERNSHIP') return <ResumeCard post={post} />;
   return <DefaultCard post={post} />;
 }
 
