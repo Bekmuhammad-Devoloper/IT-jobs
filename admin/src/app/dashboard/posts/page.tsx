@@ -320,10 +320,6 @@ export default function AdminPostsPage() {
     </div>
   );
 }
-  viewCount: number;
-  author?: { firstName: string; lastName?: string };
-  createdAt: string;
-}
 
 const typeLabels: Record<string, string> = {
   VACANCY: 'Vakansiya',
