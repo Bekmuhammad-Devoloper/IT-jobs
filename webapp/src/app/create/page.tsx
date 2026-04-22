@@ -120,8 +120,8 @@ export default function CreatePage() {
           <FG label="Texnologiyalar" hint="vergul bilan">
             <input className="input" placeholder="React, Node.js, TypeScript" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
           </FG>
-          <FG label={type === 'RESUME' || type === 'COURSE' ? "Murojaat qilish vaqti" : "Havola"}>
-            <input className="input" placeholder={type === 'RESUME' || type === 'COURSE' ? "8:00 - 22:00" : "https://..."} value={f.link} onChange={e=>set('link',e.target.value)} />
+          <FG label={type === 'VACANCY' ? "Ish vaqti" : "Murojaat qilish vaqti"} hint={type === 'VACANCY' ? "masalan 9:00 - 18:00" : undefined}>
+            <input className="input" placeholder={type === 'VACANCY' ? "9:00 - 18:00" : "8:00 - 22:00"} value={f.link} onChange={e=>set('link',e.target.value)} />
           </FG>
 
           <div className="divider" />

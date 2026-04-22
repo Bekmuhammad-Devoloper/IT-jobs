@@ -255,7 +255,7 @@ export class PostsService {
         ];
         if (post.company) lines.push(`🏢 <b>Idora:</b> ${post.company}`);
         if (post.technologies?.length) lines.push(`📚 <b>Texnologiya:</b> ${(post.technologies as string[]).join(', ')}`);
-        lines.push(`👷 <b>Mas'ul:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
+        lines.push(`👷 <b>Admin:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
         if (post.salary) lines.push(`💰 <b>Maosh:</b> ${post.salary}`);
         lines.push('');
         lines.push(`#vakansiya #xodim_topildi`);

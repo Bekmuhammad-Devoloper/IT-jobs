@@ -126,8 +126,8 @@ export class TelegramService {
     if (p.contactPhone) lines.push(`📞 <b>Aloqa:</b> ${p.contactPhone}`);
     if (p.city) lines.push(`🌐 <b>Hudud:</b> ${p.city}`);
     const authorTg = p.author?.username ? `@${p.author.username}` : (p.contactTelegram || '');
-    lines.push(`👷 <b>Mas'ul:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
-    if (p.link) lines.push(`🕰 <b>Murojaat vaqti:</b> ${p.link}`);
+    lines.push(`👷 <b>Admin:</b> ${authorName}${authorTg ? ' ' + authorTg : ''}`);
+    if (p.link) lines.push(`⏰ <b>Ish vaqti:</b> ${p.link}`);
     if (p.workType) lines.push(`🕐 <b>Ish formati:</b> ${p.workType}`);
     if (p.salary) lines.push(`💰 <b>Maosh:</b> ${p.salary}`);
     if (p.description) {
@@ -143,10 +143,13 @@ export class TelegramService {
   // ── MENTOR ──
   private formatMentor(p: any, authorName: string, channel: string, link: string): string {
     const lines: string[] = [
-      `👨‍🏫 <b>Mentor: ${authorName}</b>`,
+      `� <b>Shogird kerak:</b>`,
+      '',
+      '',
     ];
+    if (p.author?.profession) lines.push(`�‍💻 <b>Mutaxassisligi:</b> ${p.author.profession}`);
+    lines.push(`👨‍🏫 <b>Mentor:</b> ${authorName}`);
     if (p.title && p.title !== authorName) lines.push(`📌 <b>${p.title}</b>`);
-    if (p.author?.profession) lines.push(`👨‍💻 <b>Kasbi:</b> ${p.author.profession}`);
     if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
     if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
     if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
@@ -193,8 +196,7 @@ export class TelegramService {
   // ── COURSE ──
   private formatCourse(p: any, authorName: string, channel: string, link: string): string {
     const lines: string[] = [
-      `📚 <b>Kurs</b>`,
-      `<b>O'rgatish:</b>`,
+      `📚 <b>Kurs | O'rgatish:</b>`,
       '',
     ];
     if (p.title) lines.push(`🎯 <b>Kurs nomi:</b> ${p.title}`);
