@@ -155,7 +155,16 @@ export class TelegramService {
     if (p.experience || p.author?.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience || p.author.experience}`);
     if (p.technologies?.length) lines.push(`🛠 <b>Texnologiyalar:</b> ${p.technologies.join(', ')}`);
     if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
-    if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
+    if (p.salary) lines.push(`💰 <b>Oylik to'lov:</b> ${p.salary}`);
+
+    const extra = p.extra || {};
+    const durationHours = extra.durationHours ?? extra.duration;
+    const daysPerWeek = extra.daysPerWeek;
+    const months = extra.months ?? extra.durationMonths;
+    if (durationHours) lines.push(`⏱ <b>Dars davomiyligi:</b> ${durationHours} soat`);
+    if (daysPerWeek) lines.push(`📅 <b>Haftada:</b> ${daysPerWeek} kun`);
+    if (months) lines.push(`🗓 <b>Muddati:</b> ${months} oy`);
+
     if (p.description) {
       lines.push('');
       lines.push(`📝 ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);

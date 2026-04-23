@@ -177,6 +177,7 @@ textarea.input { resize: vertical; line-height: 1.5; }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 @keyframes courseFloatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes vacancyFloatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes mentorFloatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 .anim-fade { animation: fadeIn 0.4s var(--ease) both; }
 .anim-slide { animation: slideUp 0.45s var(--ease) both; }

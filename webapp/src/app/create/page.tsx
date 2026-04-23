@@ -24,6 +24,7 @@ export default function CreatePage() {
     title:'', description:'', company:'', city:'', salary:'',
     experience:'', workType:'', technologies:'', link:'',
     contactTelegram:'', contactPhone:'', contactEmail:'',
+    durationHours:'', daysPerWeek:'', months:'',
   });
   const [requiredFields, setRequiredFields] = useState<string[]>([]);
 
@@ -55,7 +56,19 @@ export default function CreatePage() {
       if (f.contactEmail.trim()) clean.contactEmail = f.contactEmail;
       const techs = f.technologies.split(',').map(t=>t.trim()).filter(Boolean);
       if (techs.length) clean.technologies = techs;
-      if (requiredFields.length > 0) clean.extra = { requiredFields };
+
+      const extra: Record<string, any> = {};
+      if (requiredFields.length > 0) extra.requiredFields = requiredFields;
+      if (type === 'MENTOR') {
+        const dh = parseInt(f.durationHours, 10);
+        const dw = parseInt(f.daysPerWeek, 10);
+        const mo = parseInt(f.months, 10);
+        if (Number.isFinite(dh) && dh > 0) extra.durationHours = dh;
+        if (Number.isFinite(dw) && dw > 0 && dw <= 7) extra.daysPerWeek = dw;
+        if (Number.isFinite(mo) && mo > 0) extra.months = mo;
+      }
+      if (Object.keys(extra).length > 0) clean.extra = extra;
+
       await api.posts.create(clean);
       router.push('/posts');
     } catch(e: any) { console.error(e); alert(e?.message || JSON.stringify(e) || "Xatolik yuz berdi"); }
@@ -127,6 +140,27 @@ export default function CreatePage() {
           <FG label="Texnologiyalar" hint="vergul bilan">
             <input className="input" placeholder="React, Node.js, TypeScript" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
           </FG>
+
+          {type === 'MENTOR' && (
+            <>
+              <div className="divider" />
+              <h3 style={{fontWeight:800,fontSize:14,color:'var(--navy)',display:'flex',alignItems:'center',gap:6}}>
+                <svg width="15" height="15" fill="none" stroke="var(--navy)" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Kurs davomiyligi
+              </h3>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+                <FG label="Soat (dars)" hint="jami">
+                  <input className="input" type="number" min={1} placeholder="60" value={f.durationHours} onChange={e=>set('durationHours',e.target.value)} />
+                </FG>
+                <FG label="Kun/hafta">
+                  <input className="input" type="number" min={1} max={7} placeholder="3" value={f.daysPerWeek} onChange={e=>set('daysPerWeek',e.target.value)} />
+                </FG>
+                <FG label="Oy">
+                  <input className="input" type="number" min={1} placeholder="3" value={f.months} onChange={e=>set('months',e.target.value)} />
+                </FG>
+              </div>
+            </>
+          )}
           <FG label={type === 'VACANCY' ? "Ish vaqti" : "Murojaat qilish vaqti"} hint={type === 'VACANCY' ? "masalan 9:00 - 18:00" : undefined}>
             <input className="input" placeholder={type === 'VACANCY' ? "9:00 - 18:00" : "8:00 - 22:00"} value={f.link} onChange={e=>set('link',e.target.value)} />
           </FG>
