@@ -106,8 +106,8 @@ export class PostsService {
       const aPin = a.pinnedOrder ?? 999999;
       const bPin = b.pinnedOrder ?? 999999;
       if (aPin !== bPin) return aPin - bPin;
-      const aRating = Number(a.rating) || 0;
-      const bRating = Number(b.rating) || 0;
+      const aRating = parseFloat(String(a.rating)) || 0;
+      const bRating = parseFloat(String(b.rating)) || 0;
       if (bRating !== aRating) return bRating - aRating;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
