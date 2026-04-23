@@ -102,7 +102,7 @@ export class PostsService {
       this.prisma.post.count({ where }),
     ]);
 
-    const sorted = sort ? posts : [...posts].sort((a, b) => {
+    const sorted = sort ? posts : [...posts].sort((a: any, b: any) => {
       const aPin = a.pinnedOrder ?? 999999;
       const bPin = b.pinnedOrder ?? 999999;
       if (aPin !== bPin) return aPin - bPin;
