@@ -2,7 +2,7 @@
 import type { Post } from '@/types';
 import { timeAgo } from '@/lib/utils';
 import Link from 'next/link';
-import { Briefcase, MapPin, Eye, DollarSign } from 'lucide-react';
+import { Briefcase, MapPin, Eye, Clock, Calendar, CalendarDays } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 
 interface CourseCardProps {
@@ -24,6 +24,11 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
   const visibleSkills = techs.slice(0, maxSkills);
   const remainingCount = techs.length - maxSkills;
   const title = post.title || 'Kurs';
+  const extra = (post.extra || {}) as Record<string, any>;
+  const durationHours = extra.durationHours ?? extra.duration ?? null;
+  const daysPerWeek = extra.daysPerWeek ?? null;
+  const months = extra.months ?? extra.durationMonths ?? null;
+  const rating = parseFloat(String((post as any).rating)) || 0;
   const dur = m ? 300 : 700;
   const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
@@ -109,6 +114,39 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
               <MapPin size={m ? 12 : 14} strokeWidth={2} /> {post.city}
             </span>
           )}
+          {durationHours && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: m ? 4 : 6,
+              fontSize: m ? 11 : 13, fontWeight: 500, color: 'hsl(215, 16%, 47%)',
+              background: 'hsla(0, 0%, 100%, 0.6)', backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', border: '1px solid hsla(0, 0%, 100%, 0.5)',
+              padding: m ? '5px 10px' : '5px 12px', borderRadius: 10,
+            }}>
+              <Clock size={m ? 12 : 14} strokeWidth={2} /> {durationHours} soat
+            </span>
+          )}
+          {daysPerWeek && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: m ? 4 : 6,
+              fontSize: m ? 11 : 13, fontWeight: 500, color: 'hsl(215, 16%, 47%)',
+              background: 'hsla(0, 0%, 100%, 0.6)', backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', border: '1px solid hsla(0, 0%, 100%, 0.5)',
+              padding: m ? '5px 10px' : '5px 12px', borderRadius: 10,
+            }}>
+              <Calendar size={m ? 12 : 14} strokeWidth={2} /> {daysPerWeek} kun/hafta
+            </span>
+          )}
+          {months && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: m ? 4 : 6,
+              fontSize: m ? 11 : 13, fontWeight: 500, color: 'hsl(215, 16%, 47%)',
+              background: 'hsla(0, 0%, 100%, 0.6)', backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', border: '1px solid hsla(0, 0%, 100%, 0.5)',
+              padding: m ? '5px 10px' : '5px 12px', borderRadius: 10,
+            }}>
+              <CalendarDays size={m ? 12 : 14} strokeWidth={2} /> {months} oy
+            </span>
+          )}
         </div>
 
         {/* 4. NARX PILL */}
@@ -120,9 +158,8 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
           border: '1px solid hsla(38, 80%, 70%, 0.6)', color: 'hsl(28, 80%, 35%)',
           display: 'inline-flex', alignItems: 'center', gap: m ? 4 : 6,
         }}>
-          <DollarSign size={m ? 14 : 16} strokeWidth={2} />{' '}
           {post.salary && !isNaN(Number(post.salary)) && Number(post.salary) > 0
-            ? Number(post.salary).toLocaleString('ru-RU')
+            ? `${Number(post.salary).toLocaleString('ru-RU')} so'm/oy`
             : 'Kelishiladi'}
         </div>
 
@@ -154,7 +191,22 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
         <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.7), transparent)', marginBottom: m ? 10 : 14 }} />
 
         {/* 7. FOOTER */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <svg key={i} width={m ? 13 : 15} height={m ? 13 : 15} viewBox="0 0 24 24"
+                fill={i <= Math.round(rating) ? '#f5b731' : 'none'}
+                stroke={i <= Math.round(rating) ? '#f5b731' : '#d1d5db'}
+                strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            ))}
+            {rating > 0 && (
+              <span style={{ fontSize: m ? 11 : 12, fontWeight: 700, color: 'hsl(215, 16%, 47%)', marginLeft: 3 }}>
+                {rating.toFixed(1)}
+              </span>
+            )}
+          </div>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: m ? 13 : 14, fontWeight: 500, color: 'hsl(215, 16%, 47%)' }}>
             <Eye size={m ? 14 : 16} strokeWidth={2} /> {views}
           </span>

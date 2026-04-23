@@ -212,19 +212,29 @@ export class TelegramService {
     ];
     if (p.title) lines.push(`🎯 <b>Kurs nomi:</b> ${p.title}`);
     lines.push(`👨‍🏫 <b>Ustoz:</b> ${authorName}`);
-    if (p.author?.age) lines.push(`🕒 <b>Yosh:</b> ${p.author.age}`);
-    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
-    if (p.contactTelegram) lines.push(`📩 <b>Telegram:</b> ${p.contactTelegram}`);
-    if (p.contactPhone) lines.push(`📞 <b>Aloqa:</b> ${p.contactPhone}`);
-    if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
     if (p.company) lines.push(`🏫 <b>O'quv markaz:</b> ${p.company}`);
-    if (p.salary) lines.push(`💰 <b>Narxi:</b> ${p.salary}`);
-    if (p.workType) lines.push(`🕐 <b>Format:</b> ${p.workType}`);
     if (p.experience) lines.push(`📊 <b>Tajriba:</b> ${p.experience}`);
+    if (p.technologies?.length) lines.push(`🛠 <b>Texnologiya:</b> ${p.technologies.join(', ')}`);
+    if (p.city || p.author?.city) lines.push(`🌐 <b>Hudud:</b> ${p.city || p.author?.city}`);
+    if (p.salary) lines.push(`💰 <b>Oylik to'lov:</b> ${Number(p.salary) > 0 ? Number(p.salary).toLocaleString('ru-RU') + " so'm/oy" : p.salary}`);
+
+    const extra = p.extra || {};
+    const durationHours = extra.durationHours ?? extra.duration;
+    const daysPerWeek = extra.daysPerWeek;
+    const months = extra.months ?? extra.durationMonths;
+    if (durationHours) lines.push(`⏱ <b>Dars davomiyligi:</b> ${durationHours} soat`);
+    if (daysPerWeek) lines.push(`📅 <b>Haftada:</b> ${daysPerWeek} kun`);
+    if (months) lines.push(`🗓 <b>Muddati:</b> ${months} oy`);
+
+    if (p.workType) lines.push(`🕐 <b>Format:</b> ${p.workType}`);
     if (p.link) lines.push(`🕰 <b>Murojaat qilish vaqti:</b> ${p.link}`);
     if (p.description) {
+      lines.push('');
       lines.push(`🔎 <b>Maqsad:</b> ${p.description.length > 500 ? p.description.substring(0, 500) + '...' : p.description}`);
     }
+    lines.push('');
+    if (p.contactTelegram) lines.push(`📩 <b>Aloqa:</b> ${p.contactTelegram}`);
+    if (p.contactPhone) lines.push(`📞 ${p.contactPhone}`);
     lines.push('');
     lines.push(`#kurs ${this.buildHashtags(p)}`);
     lines.push('');

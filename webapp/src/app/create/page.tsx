@@ -59,7 +59,7 @@ export default function CreatePage() {
 
       const extra: Record<string, any> = {};
       if (requiredFields.length > 0) extra.requiredFields = requiredFields;
-      if (type === 'MENTOR') {
+      if (type === 'MENTOR' || type === 'COURSE') {
         const dh = parseInt(f.durationHours, 10);
         const dw = parseInt(f.daysPerWeek, 10);
         const mo = parseInt(f.months, 10);
@@ -141,12 +141,12 @@ export default function CreatePage() {
             <input className="input" placeholder="React, Node.js, TypeScript" value={f.technologies} onChange={e=>set('technologies',e.target.value)} />
           </FG>
 
-          {type === 'MENTOR' && (
+          {(type === 'MENTOR' || type === 'COURSE') && (
             <>
               <div className="divider" />
               <h3 style={{fontWeight:800,fontSize:14,color:'var(--navy)',display:'flex',alignItems:'center',gap:6}}>
                 <svg width="15" height="15" fill="none" stroke="var(--navy)" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                Kurs davomiyligi
+                {type === 'COURSE' ? 'Kurs davomiyligi' : 'Mentorlik davomiyligi'}
               </h3>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
                 <FG label="Soat (dars)" hint="jami">
