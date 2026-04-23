@@ -94,7 +94,7 @@ model Post {
     viewCount       Int        @default(0) @map("view_count")
     rejectReason    String?    @map("reject_reason")
     pinnedOrder     Int?       @map("pinned_order")
-    rating          Decimal    @default(0) @db.Decimal(3, 1) @map("rating")
+    rating          Decimal    @default(0) @map("rating") @db.Decimal(3, 1)
     createdAt       DateTime   @default(now()) @map("created_at")
     updatedAt       DateTime   @updatedAt @map("updated_at")
 

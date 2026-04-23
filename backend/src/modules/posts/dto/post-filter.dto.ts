@@ -50,10 +50,10 @@ export class PostFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  sort?: string = 'createdAt';
+  sort?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  order?: 'asc' | 'desc' = 'desc';
+  order?: 'asc' | 'desc';
 }
