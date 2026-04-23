@@ -17,7 +17,7 @@ function ResumeCard({ post }: { post: Post }) {
   const author = post.author;
   const photoUrl = author?.photoUrl || author?.photo;
   const name = [author?.firstName, author?.lastName].filter(Boolean).join(' ') || 'Nomalum';
-  const rating = author?.rating || 0;
+  const rating = parseFloat(String((post as any).rating)) || 0;
   const views = (post as any).views || (post as any).viewCount || 0;
   return (
     <Link href={`/posts/${post.id}`} style={{ display: 'block', textDecoration: 'none' }}>
