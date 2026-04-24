@@ -16,6 +16,7 @@ import { TelegramModule } from './modules/telegram/telegram.module';
 import { RatingModule } from './modules/rating/rating.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { ResumeModule } from './modules/resume/resume.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { UploadModule } from './modules/upload/upload.module';
     RatingModule,
     TasksModule,
     UploadModule,
+    ResumeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

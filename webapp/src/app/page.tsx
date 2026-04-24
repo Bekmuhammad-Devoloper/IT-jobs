@@ -69,6 +69,27 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* AI Resume banner */}
+      <div style={{padding:'20px 16px 0'}}>
+        <Link href="/resume" className="anim-fade d2" style={{
+          display:'flex',alignItems:'center',gap:14,padding:'14px 16px',borderRadius:16,
+          background:'linear-gradient(135deg, #1e3a5f 0%, #2a4f7a 50%, #6d28d9 100%)',
+          textDecoration:'none',boxShadow:'0 8px 24px rgba(30,58,95,0.25)',position:'relative',overflow:'hidden'
+        }}>
+          <div style={{width:44,height:44,borderRadius:12,background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d4c494" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.581a.5.5 0 010 .964L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z"/>
+            </svg>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:10,fontWeight:700,color:'#d4c494',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:2}}>AI Generator</div>
+            <div style={{fontSize:14,fontWeight:800,color:'#fff'}}>Rezyume yaratish</div>
+            <div style={{fontSize:11,color:'rgba(255,255,255,0.6)',marginTop:1}}>Shablon tanlang · bir necha daqiqada</div>
+          </div>
+          <svg width="18" height="18" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        </Link>
+      </div>
+
       {/* Quick Actions */}
       <div style={{padding:'24px 16px 0'}}>
         <h2 className="anim-fade d3" style={{fontSize:17,fontWeight:800,marginBottom:12,color:'var(--navy)'}}>Tezkor havolalar</h2>

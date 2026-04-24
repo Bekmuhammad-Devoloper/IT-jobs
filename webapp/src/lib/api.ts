@@ -1,3 +1,22 @@
+export interface ResumeEntry {
+  headerLeft: string;
+  headerRight: string;
+  subLeft: string;
+  subRight: string;
+  bullets: string[];
+}
+
+export interface GeneratedResume {
+  template: 'STUDENT' | 'PROFESSIONAL';
+  fullName: string;
+  contact: string;
+  education: ResumeEntry[];
+  experience: ResumeEntry[];
+  leadership: ResumeEntry[];
+  skills: string;
+  interests: string;
+}
+
 const API_URL = typeof window !== 'undefined'
   ? '/api'  // browser: use Next.js rewrite proxy
   : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'); // server-side
@@ -122,5 +141,14 @@ export const api = {
   telegram: {
     checkSubscription: (telegramId: string) =>
       request(`/telegram/check-subscription/${telegramId}`),
+  },
+
+  // ── Resume (AI) ───────────────────────────────────
+  resume: {
+    generate: (data: any) =>
+      request<GeneratedResume>(
+        '/resume/generate',
+        { method: 'POST', body: JSON.stringify(data) },
+      ),
   },
 };
