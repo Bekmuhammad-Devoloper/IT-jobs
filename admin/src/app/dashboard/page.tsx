@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
+import {
+  Users, FileText, Clock, Eye,
+  ShieldCheck, LayoutGrid, Settings, Zap,
+  BarChart3, PieChart, TrendingUp, Trophy,
+  UserCheck, UserX, CheckSquare, Activity,
+  AlertTriangle, Table2, ChevronRight,
+} from 'lucide-react';
 
 interface AdminStats {
   users: { total: number; active: number; blocked: number };
@@ -78,7 +85,7 @@ export default function DashboardPage() {
     <div className="loading-screen">
       <div className="admin-card error-card">
         <div className="icon-box icon-box-red" style={{margin:'0 auto 16px',width:56,height:56}}>
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01" stroke="#dc2626" strokeWidth="2" strokeLinecap="round"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#dc2626" strokeWidth="2" fill="rgba(220,38,38,0.08)"/></svg>
+          <AlertTriangle size={24} color="#dc2626" strokeWidth={2} />
         </div>
         <p style={{fontWeight:700,color:'#dc2626',fontSize:16}}>Xatolik yuz berdi</p>
         <p style={{color:'#8896ab',fontSize:13,marginTop:4}}>{error}</p>
@@ -120,12 +127,7 @@ export default function DashboardPage() {
               <div className="stat-label">Foydalanuvchilar</div>
             </div>
             <div className="icon-box icon-box-navy">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <circle cx="9" cy="7" r="4" stroke="#b8a06a" strokeWidth="1.8" fill="rgba(184,160,106,0.15)"/>
-                <path d="M2 21v-1a5 5 0 015-5h4a5 5 0 015 5v1" stroke="#b8a06a" strokeWidth="1.8" strokeLinecap="round"/>
-                <circle cx="17" cy="7" r="2.5" stroke="#b8a06a" strokeWidth="1.4" strokeDasharray="2 2"/>
-                <path d="M19 15c1.2.5 2 1.7 2 3v1" stroke="#b8a06a" strokeWidth="1.4" strokeLinecap="round" opacity="0.6"/>
-              </svg>
+              <Users size={22} color="#b8a06a" strokeWidth={1.8} />
             </div>
           </div>
         </div>
@@ -137,12 +139,7 @@ export default function DashboardPage() {
               <div className="stat-label">Jami e&apos;lonlar</div>
             </div>
             <div className="icon-box icon-box-gold-light">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <rect x="4" y="3" width="16" height="18" rx="2.5" stroke="#b8a06a" strokeWidth="1.8" fill="rgba(184,160,106,0.08)"/>
-                <path d="M8 8h8M8 12h5" stroke="#b8a06a" strokeWidth="1.8" strokeLinecap="round"/>
-                <circle cx="16" cy="17" r="4" fill="rgba(184,160,106,0.15)" stroke="#b8a06a" strokeWidth="1.4"/>
-                <path d="M14.5 17l1 1 2-2" stroke="#b8a06a" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <FileText size={22} color="#b8a06a" strokeWidth={1.8} />
             </div>
           </div>
         </div>
@@ -154,11 +151,7 @@ export default function DashboardPage() {
               <div className="stat-label">Kutilmoqda</div>
             </div>
             <div className="icon-box icon-box-blue">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9" stroke="#2563eb" strokeWidth="1.8" fill="rgba(37,99,235,0.06)"/>
-                <path d="M12 7v5l3.5 2" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="12" r="1.5" fill="#2563eb" opacity="0.4"/>
-              </svg>
+              <Clock size={22} color="#2563eb" strokeWidth={1.8} />
             </div>
           </div>
         </div>
@@ -170,11 +163,7 @@ export default function DashboardPage() {
               <div className="stat-label">Ko&apos;rishlar</div>
             </div>
             <div className="icon-box icon-box-green">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="#16a34a" strokeWidth="1.8" fill="rgba(22,163,74,0.06)"/>
-                <circle cx="12" cy="12" r="3" stroke="#16a34a" strokeWidth="1.8" fill="rgba(22,163,74,0.15)"/>
-                <circle cx="12" cy="12" r="1" fill="#16a34a"/>
-              </svg>
+              <Eye size={22} color="#16a34a" strokeWidth={1.8} />
             </div>
           </div>
         </div>
@@ -183,48 +172,37 @@ export default function DashboardPage() {
       {/* Quick actions */}
       <div className="admin-card mb-6">
         <div className="card-header">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="var(--navy)" strokeWidth="1.8" fill="rgba(30,58,95,0.06)" strokeLinejoin="round"/>
-          </svg>
+          <Zap size={18} color="var(--navy)" strokeWidth={1.8} />
           <h2>Tezkor amallar</h2>
         </div>
         <div className="quick-actions">
           <Link href="/dashboard/moderation" className="quick-action">
             <div className="quick-action-icon icon-box-green">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#16a34a" strokeWidth="1.8" fill="rgba(22,163,74,0.08)"/>
-                <path d="M9 12l2 2 4-4" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <ShieldCheck size={20} color="#16a34a" strokeWidth={1.8} />
             </div>
             <span>Moderatsiya</span>
+            <ChevronRight size={14} color="#8896ab" strokeWidth={2} />
           </Link>
           <Link href="/dashboard/posts" className="quick-action">
             <div className="quick-action-icon icon-box-blue">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="3" stroke="#2563eb" strokeWidth="1.8" fill="rgba(37,99,235,0.06)"/>
-                <path d="M7 8h10M7 12h6M7 16h8" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
+              <LayoutGrid size={20} color="#2563eb" strokeWidth={1.8} />
             </div>
             <span>E&apos;lonlar</span>
+            <ChevronRight size={14} color="#8896ab" strokeWidth={2} />
           </Link>
           <Link href="/dashboard/users" className="quick-action">
             <div className="quick-action-icon icon-box-orange">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <circle cx="9" cy="7" r="3.5" stroke="#ea580c" strokeWidth="1.8" fill="rgba(234,88,12,0.08)"/>
-                <path d="M2 20v-1a5 5 0 015-5h4a5 5 0 015 5v1" stroke="#ea580c" strokeWidth="1.8" strokeLinecap="round"/>
-                <path d="M17 8l2 2 3-3" stroke="#ea580c" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <UserCheck size={20} color="#ea580c" strokeWidth={1.8} />
             </div>
             <span>Foydalanuvchilar</span>
+            <ChevronRight size={14} color="#8896ab" strokeWidth={2} />
           </Link>
           <Link href="/dashboard/settings" className="quick-action">
             <div className="quick-action-icon icon-box-gold-light">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="3" stroke="#b8a06a" strokeWidth="1.8" fill="rgba(184,160,106,0.1)"/>
-                <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="#b8a06a" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
+              <Settings size={20} color="#b8a06a" strokeWidth={1.8} />
             </div>
             <span>Sozlamalar</span>
+            <ChevronRight size={14} color="#8896ab" strokeWidth={2} />
           </Link>
         </div>
       </div>
@@ -233,11 +211,7 @@ export default function DashboardPage() {
       <div className="grid-2-1 mb-6">
         <div className="admin-card">
           <div className="card-header">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-              <rect x="3" y="12" width="4" height="9" rx="1" stroke="var(--navy)" strokeWidth="1.6" fill="rgba(30,58,95,0.08)"/>
-              <rect x="10" y="6" width="4" height="15" rx="1" stroke="var(--navy)" strokeWidth="1.6" fill="rgba(30,58,95,0.12)"/>
-              <rect x="17" y="2" width="4" height="19" rx="1" stroke="var(--navy)" strokeWidth="1.6" fill="rgba(30,58,95,0.06)"/>
-            </svg>
+            <BarChart3 size={18} color="var(--navy)" strokeWidth={1.8} />
             <h2>E&apos;lonlar turi bo&apos;yicha</h2>
           </div>
           <div className="bar-chart">
@@ -256,11 +230,7 @@ export default function DashboardPage() {
 
         <div className="admin-card">
           <div className="card-header">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" stroke="var(--navy)" strokeWidth="1.6" fill="rgba(30,58,95,0.04)"/>
-              <path d="M12 3a9 9 0 019 9" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"/>
-              <circle cx="12" cy="12" r="3" fill="rgba(30,58,95,0.08)"/>
-            </svg>
+            <PieChart size={18} color="var(--navy)" strokeWidth={1.8} />
             <h2>Holat</h2>
           </div>
           <div className="donut-wrap">
@@ -295,19 +265,12 @@ export default function DashboardPage() {
       <div className="grid-1-1 mb-6">
         <div className="admin-card">
           <div className="card-header">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-              <path d="M3 3v18h18" stroke="var(--navy)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M7 16l4-5 4 3 5-7" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="7" cy="16" r="1.5" fill="var(--navy)" opacity="0.3"/>
-              <circle cx="11" cy="11" r="1.5" fill="var(--navy)" opacity="0.3"/>
-              <circle cx="15" cy="14" r="1.5" fill="var(--navy)" opacity="0.3"/>
-              <circle cx="20" cy="7" r="1.5" fill="var(--gold)" opacity="0.5"/>
-            </svg>
+            <TrendingUp size={18} color="var(--navy)" strokeWidth={1.8} />
             <h2>Tasdiqlash darajasi</h2>
           </div>
           <div className="progress-row">
             <div className="progress-header">
-              <span className="progress-name">✅ Tasdiqlangan</span>
+              <span className="progress-name">Tasdiqlangan</span>
               <span className="progress-num">{approvalRate}%</span>
             </div>
             <div className="progress-track">
@@ -316,7 +279,7 @@ export default function DashboardPage() {
           </div>
           <div className="progress-row">
             <div className="progress-header">
-              <span className="progress-name">⏳ Kutilmoqda</span>
+              <span className="progress-name">Kutilmoqda</span>
               <span className="progress-num">{pendingRate}%</span>
             </div>
             <div className="progress-track">
@@ -325,7 +288,7 @@ export default function DashboardPage() {
           </div>
           <div className="progress-row">
             <div className="progress-header">
-              <span className="progress-name">❌ Rad etilgan</span>
+              <span className="progress-name">Rad etilgan</span>
               <span className="progress-num">{rejectedRate}%</span>
             </div>
             <div className="progress-track">
@@ -334,7 +297,7 @@ export default function DashboardPage() {
           </div>
           <div className="progress-row">
             <div className="progress-header">
-              <span className="progress-name">👥 Foydalanuvchi faolligi</span>
+              <span className="progress-name">Foydalanuvchi faolligi</span>
               <span className="progress-num">{activeRate}%</span>
             </div>
             <div className="progress-track">
@@ -345,18 +308,13 @@ export default function DashboardPage() {
 
         <div className="admin-card">
           <div className="card-header">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-              <path d="M12 2l2.4 4.8 5.3.8-3.8 3.7.9 5.3L12 14.1l-4.8 2.5.9-5.3-3.8-3.7 5.3-.8L12 2z" stroke="var(--gold)" strokeWidth="1.8" fill="rgba(184,160,106,0.12)" strokeLinejoin="round"/>
-            </svg>
+            <Trophy size={18} color="var(--gold)" strokeWidth={1.8} />
             <h2>Top e&apos;lonlar</h2>
           </div>
           {topPosts.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon icon-box-navy-light">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <rect x="4" y="3" width="16" height="18" rx="2.5" stroke="var(--navy)" strokeWidth="1.6" fill="rgba(30,58,95,0.05)"/>
-                  <path d="M8 8h8M8 12h5M8 16h3" stroke="var(--navy)" strokeWidth="1.6" strokeLinecap="round" opacity="0.5"/>
-                </svg>
+                <FileText size={24} color="var(--navy)" strokeWidth={1.6} />
               </div>
               <p className="empty-title">Hali e&apos;lonlar yo&apos;q</p>
               <p className="empty-text">E&apos;lonlar paydo bo&apos;lganda bu yerda ko&apos;rinadi</p>
@@ -385,11 +343,7 @@ export default function DashboardPage() {
       <div className="grid-1-1 mb-6">
         <div className="admin-card">
           <div className="card-header">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-              <circle cx="9" cy="7" r="3.5" stroke="var(--navy)" strokeWidth="1.8" fill="rgba(30,58,95,0.06)"/>
-              <path d="M2 20v-1a5 5 0 015-5h4a5 5 0 015 5v1" stroke="var(--navy)" strokeWidth="1.8" strokeLinecap="round"/>
-              <path d="M17 10l1.5 1.5L22 8" stroke="var(--gold)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <UserCheck size={18} color="var(--navy)" strokeWidth={1.8} />
             <h2>Foydalanuvchilar tafsiloti</h2>
           </div>
           <div className="grid-3">
@@ -400,10 +354,7 @@ export default function DashboardPage() {
                   <div className="stat-label">Faol</div>
                 </div>
                 <div className="icon-box icon-box-green">
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="9" stroke="#16a34a" strokeWidth="1.8" fill="rgba(22,163,74,0.08)"/>
-                    <path d="M8 12l3 3 5-5" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <CheckSquare size={18} color="#16a34a" strokeWidth={1.8} />
                 </div>
               </div>
             </div>
@@ -414,10 +365,7 @@ export default function DashboardPage() {
                   <div className="stat-label">Bloklangan</div>
                 </div>
                 <div className="icon-box icon-box-red">
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="9" stroke="#dc2626" strokeWidth="1.8" fill="rgba(220,38,38,0.08)"/>
-                    <path d="M15 9l-6 6M9 9l6 6" stroke="#dc2626" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+                  <UserX size={18} color="#dc2626" strokeWidth={1.8} />
                 </div>
               </div>
             </div>
@@ -428,10 +376,7 @@ export default function DashboardPage() {
                   <div className="stat-label">Tasdiqlangan</div>
                 </div>
                 <div className="icon-box icon-box-green">
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="#16a34a" strokeWidth="1.8" fill="rgba(22,163,74,0.06)"/>
-                    <path d="M8 12l3 3 5-5" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <CheckSquare size={18} color="#16a34a" strokeWidth={1.8} />
                 </div>
               </div>
             </div>
@@ -440,13 +385,7 @@ export default function DashboardPage() {
 
         <div className="admin-card">
           <div className="card-header">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-              <rect x="2" y="3" width="20" height="18" rx="3" stroke="var(--navy)" strokeWidth="1.8" fill="rgba(30,58,95,0.04)"/>
-              <circle cx="7" cy="12" r="2" fill="var(--navy)" opacity="0.15"/>
-              <path d="M12 10v4M14 12h-4" stroke="var(--navy)" strokeWidth="1.8" strokeLinecap="round"/>
-              <circle cx="17" cy="8" r="1" fill="var(--gold)" opacity="0.5"/>
-              <circle cx="17" cy="16" r="1" fill="#16a34a" opacity="0.5"/>
-            </svg>
+            <Activity size={18} color="var(--navy)" strokeWidth={1.8} />
             <h2>Tizim holati</h2>
           </div>
           <div className="health-row">
@@ -475,12 +414,7 @@ export default function DashboardPage() {
       {/* Posts detail table */}
       <div className="admin-card mb-6">
         <div className="card-header">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="3" stroke="var(--navy)" strokeWidth="1.6" fill="rgba(30,58,95,0.04)"/>
-            <path d="M3 9h18" stroke="var(--navy)" strokeWidth="1.6"/>
-            <path d="M9 9v12" stroke="var(--navy)" strokeWidth="1.6"/>
-            <circle cx="6" cy="6" r="1" fill="var(--gold)" opacity="0.5"/>
-          </svg>
+          <Table2 size={18} color="var(--navy)" strokeWidth={1.8} />
           <h2>E&apos;lonlar jadvali</h2>
         </div>
         <table className="admin-table">
@@ -501,10 +435,7 @@ export default function DashboardPage() {
                   <td>
                     <div className="flex-gap-2">
                       <div className="icon-box icon-box-sm" style={{ background: (typeColors[item.type] || '#1e3a5f') + '12' }}>
-                        <svg width="13" height="13" fill="none" viewBox="0 0 24 24">
-                          <rect x="4" y="3" width="16" height="18" rx="2.5" stroke={typeColors[item.type] || '#1e3a5f'} strokeWidth="2" fill={(typeColors[item.type] || '#1e3a5f') + '15'}/>
-                          <path d="M8 8h8M8 12h5" stroke={typeColors[item.type] || '#1e3a5f'} strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
-                        </svg>
+                        <FileText size={13} color={typeColors[item.type] || '#1e3a5f'} strokeWidth={2} />
                       </div>
                       <span className="td-bold">{typeLabels[item.type] || item.type}</span>
                     </div>

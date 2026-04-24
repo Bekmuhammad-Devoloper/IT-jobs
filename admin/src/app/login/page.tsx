@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/api';
 import Image from 'next/image';
+import { Lock, User, ShieldAlert, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,38 +46,48 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div style={{padding:'10px 14px',marginBottom:16,borderRadius:10,background:'#fef2f2',color:'#dc2626',fontSize:13,fontWeight:500,border:'1px solid #fecaca'}}>{error}</div>
+          <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',marginBottom:16,borderRadius:10,background:'#fef2f2',color:'#dc2626',fontSize:13,fontWeight:500,border:'1px solid #fecaca'}}>
+            <ShieldAlert size={16} strokeWidth={2} />
+            <span>{error}</span>
+          </div>
         )}
 
         <form onSubmit={handleLogin} style={{display:'flex',flexDirection:'column',gap:16}}>
           <div>
             <label style={{fontSize:13,fontWeight:600,color:'#1e3a5f',marginBottom:6,display:'block'}}>Login</label>
-            <input
-              style={{width:'100%',padding:'12px 14px',borderRadius:12,border:'1.5px solid #e2e8f0',fontSize:14,outline:'none',transition:'border-color 0.2s',background:'#f8fafc'}}
-              placeholder="Login kiriting"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
+            <div style={{position:'relative'}}>
+              <User size={17} color="#8896ab" strokeWidth={1.8} style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}} />
+              <input
+                style={{width:'100%',padding:'12px 14px 12px 42px',borderRadius:12,border:'1.5px solid #e2e8f0',fontSize:14,outline:'none',transition:'border-color 0.2s',background:'#f8fafc'}}
+                placeholder="Login kiriting"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div>
             <label style={{fontSize:13,fontWeight:600,color:'#1e3a5f',marginBottom:6,display:'block'}}>Parol</label>
-            <input
-              style={{width:'100%',padding:'12px 14px',borderRadius:12,border:'1.5px solid #e2e8f0',fontSize:14,outline:'none',transition:'border-color 0.2s',background:'#f8fafc'}}
-              type="password"
-              placeholder="Parolni kiriting"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div style={{position:'relative'}}>
+              <Lock size={17} color="#8896ab" strokeWidth={1.8} style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}} />
+              <input
+                style={{width:'100%',padding:'12px 14px 12px 42px',borderRadius:12,border:'1.5px solid #e2e8f0',fontSize:14,outline:'none',transition:'border-color 0.2s',background:'#f8fafc'}}
+                type="password"
+                placeholder="Parolni kiriting"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            style={{width:'100%',padding:'12px',borderRadius:12,border:'none',fontSize:15,fontWeight:700,color:'#fff',background: loading ? '#8896ab' : 'linear-gradient(135deg, #1e3a5f, #2a4f7a)',cursor: loading ? 'not-allowed' : 'pointer',marginTop:4,boxShadow:'0 4px 14px rgba(30,58,95,0.3)',transition:'all 0.2s'}}
+            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,width:'100%',padding:'12px',borderRadius:12,border:'none',fontSize:15,fontWeight:700,color:'#fff',background: loading ? '#8896ab' : 'linear-gradient(135deg, #1e3a5f, #2a4f7a)',cursor: loading ? 'not-allowed' : 'pointer',marginTop:4,boxShadow:'0 4px 14px rgba(30,58,95,0.3)',transition:'all 0.2s'}}
           >
+            <LogIn size={16} strokeWidth={2} />
             {loading ? 'Kirish...' : 'Kirish'}
           </button>
         </form>

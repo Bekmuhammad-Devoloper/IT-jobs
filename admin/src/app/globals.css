@@ -883,13 +883,13 @@ body {
 }
 .quick-action {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 10px;
-  padding: 20px 14px;
-  border-radius: 16px;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
   border: 1.5px solid rgba(226,232,240,0.8);
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.75);
   backdrop-filter: blur(6px);
   cursor: pointer;
   transition: all var(--transition-spring);
@@ -908,24 +908,35 @@ body {
 }
 .quick-action:hover {
   border-color: var(--gold);
-  box-shadow: 0 8px 24px rgba(184,160,106,0.18);
-  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(184,160,106,0.16);
+  transform: translateY(-2px);
 }
 .quick-action:hover::before { opacity: 1; }
 .quick-action-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
+  width: 40px; height: 40px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   transition: transform var(--transition-spring);
 }
-.quick-action:hover .quick-action-icon { transform: scale(1.1); }
-.quick-action span {
-  font-size: 12px;
+.quick-action:hover .quick-action-icon { transform: scale(1.08) rotate(-3deg); }
+.quick-action > span {
+  flex: 1;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #374151;
-  text-align: center;
+  color: var(--navy);
+  text-align: left;
+}
+.quick-action > svg:last-child {
+  opacity: 0.4;
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+.quick-action:hover > svg:last-child {
+  opacity: 1;
+  transform: translateX(3px);
+  color: var(--gold);
 }
 
 /* Activity timeline */
