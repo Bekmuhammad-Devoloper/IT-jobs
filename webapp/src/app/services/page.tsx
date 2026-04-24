@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import BottomNav from '@/components/BottomNav';
-import { api } from '@/lib/api';
+import ResumePaper, { downloadResumePdf } from '@/components/ResumePaper';
+import { api, type GeneratedResume } from '@/lib/api';
 
 interface ServiceChild {
   id: number;
@@ -66,9 +67,12 @@ export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null);
   const [step, setStep] = useState(0); // 0=list, 1..N=questions, N+1=generating, N+2=result
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [generatedResume, setGeneratedResume] = useState('');
+  const [resumeResult, setResumeResult] = useState<GeneratedResume | null>(null);
+  const [genError, setGenError] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const resumePaperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.services.getAll()
@@ -85,7 +89,8 @@ export default function ServicesPage() {
     setSelectedCategory(cat);
     setStep(1);
     setAnswers({});
-    setGeneratedResume('');
+    setResumeResult(null);
+    setGenError('');
     setSent(false);
   }
 
@@ -107,102 +112,112 @@ export default function ServicesPage() {
     }
   }
 
-  function generateResume() {
-    setStep(RESUME_QUESTIONS.length + 1); // generating state
-    // Build resume text
-    setTimeout(() => {
-      const a = answers;
-      const lines: string[] = [];
-      lines.push('═══════════════════════════════');
-      lines.push(`   ${(a.fullName || 'Ism kiritilmagan').toUpperCase()}`);
-      lines.push(`   ${a.position || 'Lavozim kiritilmagan'}`);
-      lines.push('═══════════════════════════════');
-      lines.push('');
-      lines.push('📞 Kontakt:');
-      if (a.phone) lines.push(`   Tel: ${a.phone}`);
-      if (a.email) lines.push(`   Email: ${a.email}`);
-      if (a.city) lines.push(`   📍 ${a.city}`);
-      if (a.birthYear) lines.push(`   Tug'ilgan yil: ${a.birthYear}`);
-      lines.push('');
-      if (a.about) {
-        lines.push('👤 Haqida:');
-        lines.push(`   ${a.about}`);
-        lines.push('');
-      }
-      if (a.skills) {
-        lines.push('🛠 Ko\'nikmalar:');
-        a.skills.split(',').map(s => s.trim()).filter(Boolean).forEach(s => {
-          lines.push(`   • ${s}`);
-        });
-        lines.push('');
-      }
-      if (a.experience) {
-        lines.push(`💼 Tajriba: ${a.experience}`);
-        lines.push('');
-      }
-      if (a.workHistory) {
-        lines.push('🏢 Ish tajribasi:');
-        a.workHistory.split('\n').filter(Boolean).forEach(w => {
-          lines.push(`   ▸ ${w.trim()}`);
-        });
-        lines.push('');
-      }
-      if (a.education) {
-        lines.push('🎓 Ta\'lim:');
-        lines.push(`   ${a.education}`);
-        lines.push('');
-      }
-      if (a.languages) {
-        lines.push('🌐 Tillar:');
-        a.languages.split(',').map(l => l.trim()).filter(Boolean).forEach(l => {
-          lines.push(`   • ${l}`);
-        });
-        lines.push('');
-      }
-      if (a.projects) {
-        lines.push('📁 Loyihalar:');
-        a.projects.split('\n').filter(Boolean).forEach(p => {
-          lines.push(`   ▸ ${p.trim()}`);
-        });
-        lines.push('');
-      }
-      if (a.github) lines.push(`🔗 GitHub: ${a.github}`);
-      if (a.portfolio) lines.push(`🔗 Portfolio: ${a.portfolio}`);
-      lines.push('');
-      lines.push('═══════════════════════════════');
-      lines.push(`Xizmat: ${selectedCategory?.title} → ${selectedService?.title}`);
-      if (selectedService?.price) lines.push(`Narxi: ${formatPrice(selectedService.price)}`);
-      lines.push('═══════════════════════════════');
+  function detectTemplate(): 'STUDENT' | 'PROFESSIONAL' {
+    const blob = `${selectedCategory?.title || ''} ${selectedService?.title || ''}`.toLowerCase();
+    if (/student|stajirovka|talaba|o['’`]quvchi/.test(blob)) return 'STUDENT';
+    return 'PROFESSIONAL';
+  }
 
-      setGeneratedResume(lines.join('\n'));
+  function buildResumePayload() {
+    const a = answers;
+    const eduParts = (a.education || '').split(/[,;]|\s—\s|\s-\s/).map(s => s.trim()).filter(Boolean);
+    const education = a.education?.trim()
+      ? [{
+          university: eduParts[0] || a.education.trim(),
+          degree: eduParts[1] || 'Mutaxassislik kiritilmagan',
+          graduationYear: eduParts[2] || undefined,
+          city: a.city || undefined,
+          coursework: undefined,
+        }]
+      : [];
+
+    const workLines = (a.workHistory || '')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
+    const experience = workLines.length > 0
+      ? workLines.map(line => {
+          const parts = line.split(/\s—\s|\s-\s|\s\|\s/).map(s => s.trim());
+          return {
+            company: parts[0] || line,
+            position: parts[1] || a.position || 'Lavozim',
+            period: parts[2] || undefined,
+            city: a.city || undefined,
+            description: a.about || a.experience || undefined,
+          };
+        })
+      : (a.about || a.experience || a.projects
+          ? [{
+              company: a.position ? `${a.position} tajribasi` : 'Ish tajribasi',
+              position: a.position || 'Mutaxassis',
+              period: a.experience || undefined,
+              city: a.city || undefined,
+              description: [a.about, a.experience, a.projects].filter(Boolean).join('\n'),
+            }]
+          : []);
+
+    return {
+      template: detectTemplate(),
+      fullName: a.fullName?.trim() || 'Ism kiritilmagan',
+      city: a.city?.trim() || undefined,
+      phone: a.phone?.trim() || undefined,
+      email: a.email?.trim() || undefined,
+      linkedin: a.portfolio?.trim() || a.github?.trim() || undefined,
+      targetRole: a.position?.trim() || undefined,
+      education,
+      experience,
+      leadership: [],
+      skills: (a.skills || '').split(',').map(s => s.trim()).filter(Boolean),
+      languages: (a.languages || '').split(',').map(s => s.trim()).filter(Boolean),
+      interests: undefined,
+    };
+  }
+
+  async function generateResume() {
+    setStep(RESUME_QUESTIONS.length + 1);
+    setGenError('');
+    try {
+      const payload = buildResumePayload();
+      const res = await api.resume.generate(payload);
+      setResumeResult(res);
       setStep(RESUME_QUESTIONS.length + 2);
-    }, 1500);
+    } catch (e: any) {
+      setGenError(e?.message || 'Xatolik yuz berdi');
+      setStep(RESUME_QUESTIONS.length); // back to last question
+    }
   }
 
   async function sendToTelegram() {
+    if (!resumeResult) return;
     setSending(true);
     const support = (process.env.NEXT_PUBLIC_SUPPORT_TG || 'itjobs_support').replace('@', '');
     const supportUrl = `https://t.me/${support}`;
-    let copied = false;
     try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(generatedResume);
-        copied = true;
-      }
-      window.open(`${supportUrl}?text=${encodeURIComponent('📋 Resume buyurtma yubordim. Tekshirib ko\'ring!')}`, '_blank');
+      const msg = [
+        `Resume buyurtma: ${resumeResult.fullName}`,
+        `Xizmat: ${selectedCategory?.title} → ${selectedService?.title}`,
+        selectedService?.price ? `Narxi: ${formatPrice(selectedService.price)}` : '',
+        '',
+        'Resume tayyorlandi, PDF yuborishim mumkinmi?',
+      ].filter(Boolean).join('\n');
+      window.open(`${supportUrl}?text=${encodeURIComponent(msg)}`, '_blank');
       setSent(true);
-      if (!copied) {
-        alert("Resume matnini avtomatik nusxalab bo'lmadi — qo'lda ko'chiring.");
-      }
     } catch {
       window.open(supportUrl, '_blank');
     }
     setSending(false);
   }
 
-  function copyResume() {
-    navigator.clipboard?.writeText(generatedResume);
-    alert('Resume nusxalandi!');
+  async function downloadPdf() {
+    if (!resumePaperRef.current || !resumeResult) return;
+    setDownloading(true);
+    try {
+      await downloadResumePdf(resumePaperRef.current, resumeResult.fullName);
+    } catch (e: any) {
+      alert('PDF yaratishda xatolik: ' + (e?.message || 'noma\'lum'));
+    } finally {
+      setDownloading(false);
+    }
   }
 
   // ============ QUESTIONNAIRE UI ============
@@ -245,44 +260,41 @@ export default function ServicesPage() {
           {isGenerating ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
               <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #f1f5f9', borderTopColor: '#1e3a5f', animation: 'spin 0.8s linear infinite' }} />
-              <p style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Resume yaratilmoqda...</p>
-              <p style={{ fontSize: 13, color: '#94a3b8' }}>Biroz kuting</p>
+              <p style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>AI resume yozmoqda...</p>
+              <p style={{ fontSize: 13, color: '#94a3b8' }}>Bir necha soniya</p>
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
-          ) : isResult ? (
+          ) : isResult && resumeResult ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ textAlign: 'center', padding: '16px 0' }}>
+              <div style={{ textAlign: 'center', padding: '8px 0' }}>
                 <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#ecfdf5', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                   <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#059669" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                 </div>
                 <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>Resume tayyor!</h2>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Shablon: {resumeResult.template === 'STUDENT' ? 'Student' : 'Professional'}</p>
               </div>
 
-              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e2e8f0', padding: 16, flex: 1, overflow: 'auto' }}>
-                <pre style={{ fontSize: 12.5, lineHeight: 1.6, color: '#334155', whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: "'SF Mono', 'Fira Code', monospace", margin: 0 }}>
-                  {generatedResume}
-                </pre>
+              <div style={{ background: '#e2e8f0', borderRadius: 14, padding: '16px 8px', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                <div ref={resumePaperRef}>
+                  <ResumePaper data={resumeResult} />
+                </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 16 }}>
-                <button onClick={sendToTelegram} disabled={sending} style={{
-                  padding: '14px', borderRadius: 12, border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  background: sent ? '#059669' : '#1e3a5f', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                <button type="button" onClick={downloadPdf} disabled={downloading} style={{
+                  padding: '14px', borderRadius: 12, border: 'none', fontSize: 14, fontWeight: 800, cursor: downloading ? 'not-allowed' : 'pointer',
+                  background: downloading ? '#94a3b8' : 'linear-gradient(135deg, #1e3a5f, #6d28d9)', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  boxShadow: '0 4px 14px rgba(109,40,217,0.25)'
                 }}>
-                  {sent ? (
-                    <><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg> Yuborildi!</>
-                  ) : (
-                    <><svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 5L2 12.5l7 1M21 5l-4 15-7-8.5M21 5l-12 8.5"/></svg> {sending ? 'Yuborilmoqda...' : 'Telegram orqali yuborish'}</>
-                  )}
+                  {downloading ? 'PDF tayyorlanmoqda...' : 'PDF yuklab olish'}
                 </button>
-                <button onClick={copyResume} style={{
-                  padding: '12px', borderRadius: 12, border: '1.5px solid #e2e8f0',
-                  background: '#fff', fontSize: 13, fontWeight: 600, color: '#475569', cursor: 'pointer',
+                <button type="button" onClick={sendToTelegram} disabled={sending} style={{
+                  padding: '13px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  background: sent ? '#059669' : '#fff', color: sent ? '#fff' : '#1e3a5f',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
                 }}>
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                  Nusxalash
+                  {sent ? 'Telegram ochildi' : (sending ? 'Yuborilmoqda...' : 'Telegramda qo\'llab-quvvatlash')}
                 </button>
               </div>
             </div>
@@ -325,6 +337,11 @@ export default function ServicesPage() {
                 <p style={{ fontSize: 12, color: '#94a3b8' }}>
                   {step <= 5 ? "* Majburiy" : "Ixtiyoriy — o'tkazib yuborish mumkin"}
                 </p>
+                {genError && (
+                  <div style={{ padding: '10px 12px', borderRadius: 10, background: '#fef2f2', color: '#b91c1c', fontSize: 12, fontWeight: 600, border: '1px solid #fecaca' }}>
+                    {genError}
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: 10, paddingBottom: 24 }}>
