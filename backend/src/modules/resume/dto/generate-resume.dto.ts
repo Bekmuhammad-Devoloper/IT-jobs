@@ -159,4 +159,22 @@ export class GenerateResumeDto {
   @IsString()
   @MaxLength(1000)
   targetRole?: string;
+
+  @ApiPropertyOptional({ description: 'URL of uploaded payment receipt screenshot' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  paymentProof?: string;
+
+  @ApiPropertyOptional({ description: 'Service category the user ordered (e.g. "Mentorlar uchun professional resume")' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  serviceTitle?: string;
+
+  @ApiPropertyOptional({ description: 'Amount paid (string, e.g. "5000")' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  amount?: string;
 }

@@ -11,6 +11,7 @@ import {
   GenerateResumeDto,
   ResumeTemplate,
 } from './dto/generate-resume.dto';
+import { TelegramService } from '../telegram/telegram.service';
 
 const GEMINI_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -40,11 +41,47 @@ export interface GeneratedResume {
 export class ResumeService {
   private readonly logger = new Logger(ResumeService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly telegram: TelegramService,
+  ) {}
 
   async generate(dto: GenerateResumeDto): Promise<GeneratedResume> {
+    if (dto.paymentProof) {
+      this.notifyAdmins(dto).catch((err) =>
+        this.logger.warn(`Admin notify failed: ${err?.message}`),
+      );
+    }
     const polished = await this.polishWithAI(dto);
     return this.buildResume(dto, polished);
+  }
+
+  private async notifyAdmins(dto: GenerateResumeDto) {
+    if (!dto.paymentProof) return;
+    const webappUrl = this.config.get<string>('WEBAPP_URL', '');
+    const fullUrl = dto.paymentProof.startsWith('http')
+      ? dto.paymentProof
+      : `${webappUrl.replace(/\/$/, '')}${dto.paymentProof}`;
+    const caption =
+      [
+        '<b>💳 Yangi rezyume buyurtmasi</b>',
+        dto.serviceTitle ? `🎯 Xizmat: ${this.esc(dto.serviceTitle)}` : '',
+        dto.amount ? `💰 Summa: ${this.esc(dto.amount)} so'm` : '',
+        '',
+        `👤 Ism: ${this.esc(dto.fullName)}`,
+        dto.targetRole ? `📌 Lavozim: ${this.esc(dto.targetRole)}` : '',
+        dto.phone ? `📞 ${this.esc(dto.phone)}` : '',
+        dto.email ? `📧 ${this.esc(dto.email)}` : '',
+        '',
+        `🖼 Chek rasm: ${this.esc(fullUrl)}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
+    await this.telegram.sendPhotoToAdmins(fullUrl, caption);
+  }
+
+  private esc(s: string): string {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   private getKeys(): string[] {

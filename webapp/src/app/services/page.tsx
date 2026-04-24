@@ -65,14 +65,21 @@ export default function ServicesPage() {
   // Questionnaire state
   const [selectedService, setSelectedService] = useState<ServiceChild | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null);
-  const [step, setStep] = useState(0); // 0=list, 1..N=questions, N+1=generating, N+2=result
+  const [step, setStep] = useState(0); // 0=list, 1..N=questions, N+1=payment, N+2=generating, N+3=result
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [resumeResult, setResumeResult] = useState<GeneratedResume | null>(null);
   const [genError, setGenError] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [paymentProof, setPaymentProof] = useState<string>('');
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [copiedCard, setCopiedCard] = useState(false);
   const resumePaperRef = useRef<HTMLDivElement>(null);
+
+  const PAYMENT_CARD = process.env.NEXT_PUBLIC_PAYMENT_CARD || '9860 0101 2345 6789';
+  const PAYMENT_OWNER = process.env.NEXT_PUBLIC_PAYMENT_OWNER || 'BEKMUHAMMAD XAMIDOV';
 
   useEffect(() => {
     api.services.getAll()
@@ -92,6 +99,8 @@ export default function ServicesPage() {
     setResumeResult(null);
     setGenError('');
     setSent(false);
+    setPaymentProof('');
+    setUploadError('');
   }
 
   function goBack() {
@@ -108,8 +117,38 @@ export default function ServicesPage() {
     if (step < RESUME_QUESTIONS.length) {
       setStep(step + 1);
     } else {
-      generateResume();
+      // After last question, go to payment step
+      setStep(RESUME_QUESTIONS.length + 1);
     }
+  }
+
+  async function handleFileUpload(file: File) {
+    setUploadError('');
+    if (!file.type.startsWith('image/')) {
+      setUploadError("Faqat rasm formatini yuklang (JPG, PNG)");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Rasm hajmi 5MB dan oshmasin');
+      return;
+    }
+    setUploadingProof(true);
+    try {
+      const res = await api.upload.file(file);
+      setPaymentProof(res.url);
+    } catch (e: any) {
+      setUploadError(e?.message || 'Yuklashda xatolik');
+    } finally {
+      setUploadingProof(false);
+    }
+  }
+
+  async function copyCard() {
+    try {
+      await navigator.clipboard.writeText(PAYMENT_CARD.replace(/\s/g, ''));
+      setCopiedCard(true);
+      setTimeout(() => setCopiedCard(false), 2000);
+    } catch {}
   }
 
   function detectTemplate(): 'STUDENT' | 'PROFESSIONAL' {
@@ -156,6 +195,7 @@ export default function ServicesPage() {
             }]
           : []);
 
+    const rawPrice = (selectedService?.price || '').replace(/\D/g, '');
     return {
       template: detectTemplate(),
       fullName: a.fullName?.trim() || 'Ism kiritilmagan',
@@ -170,20 +210,23 @@ export default function ServicesPage() {
       skills: (a.skills || '').split(',').map(s => s.trim()).filter(Boolean),
       languages: (a.languages || '').split(',').map(s => s.trim()).filter(Boolean),
       interests: undefined,
+      paymentProof: paymentProof || undefined,
+      serviceTitle: selectedService?.title || undefined,
+      amount: rawPrice || undefined,
     };
   }
 
   async function generateResume() {
-    setStep(RESUME_QUESTIONS.length + 1);
+    setStep(RESUME_QUESTIONS.length + 2);
     setGenError('');
     try {
       const payload = buildResumePayload();
       const res = await api.resume.generate(payload);
       setResumeResult(res);
-      setStep(RESUME_QUESTIONS.length + 2);
+      setStep(RESUME_QUESTIONS.length + 3);
     } catch (e: any) {
       setGenError(e?.message || 'Xatolik yuz berdi');
-      setStep(RESUME_QUESTIONS.length); // back to last question
+      setStep(RESUME_QUESTIONS.length + 1); // back to payment
     }
   }
 
@@ -223,10 +266,11 @@ export default function ServicesPage() {
   // ============ QUESTIONNAIRE UI ============
   if (selectedService && step > 0) {
     const totalQ = RESUME_QUESTIONS.length;
-    const isGenerating = step === totalQ + 1;
-    const isResult = step === totalQ + 2;
+    const isPayment = step === totalQ + 1;
+    const isGenerating = step === totalQ + 2;
+    const isResult = step === totalQ + 3;
     const currentQ = step <= totalQ ? RESUME_QUESTIONS[step - 1] : null;
-    const progress = isResult ? 100 : isGenerating ? 95 : Math.round((step / totalQ) * 90);
+    const progress = isResult ? 100 : isGenerating ? 95 : isPayment ? 92 : Math.round((step / totalQ) * 88);
 
     return (
       <div style={{ minHeight: '100dvh', background: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
@@ -250,14 +294,108 @@ export default function ServicesPage() {
           <div style={{ height: 4, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${progress}%`, background: 'linear-gradient(90deg, #1e3a5f, #b8a06a)', borderRadius: 2, transition: 'width 0.4s ease' }} />
           </div>
-          {!isResult && !isGenerating && (
+          {!isResult && !isGenerating && !isPayment && (
             <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 6, textAlign: 'right' }}>{step}/{totalQ}</p>
+          )}
+          {isPayment && (
+            <p style={{ fontSize: 11, color: '#b8a06a', fontWeight: 700, marginTop: 6, textAlign: 'right' }}>To&apos;lov bosqichi</p>
           )}
         </div>
 
         {/* Content */}
         <div style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column' }}>
-          {isGenerating ? (
+          {isPayment ? (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 16 }}>
+              <div style={{ textAlign: 'center', marginTop: 4 }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#fef3c7', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#b8a06a" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path strokeLinecap="round" d="M6 15h4"/></svg>
+                </div>
+                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a' }}>To&apos;lov qilish</h2>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 2, lineHeight: 1.4 }}>
+                  Quyidagi kartaga to&apos;lov qilib, chek rasmini yuklang
+                </p>
+              </div>
+
+              <div style={{ padding: 14, borderRadius: 14, background: 'linear-gradient(135deg, #1e3a5f 0%, #2a4f7a 100%)', color: '#fff', position: 'relative' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Karta raqami</div>
+                <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "'SF Mono', ui-monospace, monospace", letterSpacing: '0.08em' }}>{PAYMENT_CARD}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Egasi</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, marginTop: 2 }}>{PAYMENT_OWNER}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Summa</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#d4c494', marginTop: 2 }}>{selectedService.price ? formatPrice(selectedService.price) : '—'}</div>
+                  </div>
+                </div>
+                <button type="button" onClick={copyCard} style={{ position: 'absolute', top: 10, right: 10, padding: '6px 10px', borderRadius: 8, border: 'none', background: copiedCard ? '#059669' : 'rgba(255,255,255,0.15)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                  {copiedCard ? 'Nusxalandi' : 'Nusxalash'}
+                </button>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', display: 'block', marginBottom: 6 }}>
+                  Chek rasmini yuklang *
+                </label>
+                {paymentProof ? (
+                  <div style={{ padding: 10, borderRadius: 12, border: '1.5px solid #059669', background: '#ecfdf5', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src={paymentProof} alt="Chek" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46' }}>Chek yuklandi</div>
+                      <div style={{ fontSize: 11, color: '#059669', marginTop: 1 }}>Resume yaratishga tayyor</div>
+                    </div>
+                    <button type="button" onClick={() => setPaymentProof('')} style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #fecaca', background: '#fff', color: '#dc2626', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                      O&apos;chirish
+                    </button>
+                  </div>
+                ) : (
+                  <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, borderRadius: 12, border: '2px dashed #cbd5e1', background: '#fff', cursor: uploadingProof ? 'wait' : 'pointer', gap: 8, transition: 'border-color 0.2s' }}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); }}
+                      style={{ display: 'none' }}
+                      disabled={uploadingProof}
+                    />
+                    <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" strokeWidth="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#475569' }}>
+                      {uploadingProof ? 'Yuklanmoqda...' : 'Rasm tanlash (JPG, PNG)'}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#94a3b8' }}>Chek screenshotini tanlang</div>
+                  </label>
+                )}
+                {uploadError && (
+                  <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 8, background: '#fef2f2', color: '#b91c1c', fontSize: 12, fontWeight: 600, border: '1px solid #fecaca' }}>
+                    {uploadError}
+                  </div>
+                )}
+              </div>
+
+              {genError && (
+                <div style={{ padding: '10px 12px', borderRadius: 10, background: '#fef2f2', color: '#b91c1c', fontSize: 12, fontWeight: 600, border: '1px solid #fecaca' }}>
+                  {genError}
+                </div>
+              )}
+
+              <div style={{ flex: 1 }} />
+
+              <button
+                type="button"
+                onClick={() => paymentProof && generateResume()}
+                disabled={!paymentProof || uploadingProof}
+                style={{
+                  padding: '14px', borderRadius: 12, border: 'none', fontSize: 14, fontWeight: 800, cursor: paymentProof ? 'pointer' : 'not-allowed',
+                  background: paymentProof ? 'linear-gradient(135deg, #1e3a5f, #6d28d9)' : '#cbd5e1',
+                  color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  boxShadow: paymentProof ? '0 4px 14px rgba(109,40,217,0.25)' : 'none',
+                }}
+              >
+                {paymentProof ? 'Resume yaratish ✨' : 'Avval chek yuklang'}
+              </button>
+            </div>
+          ) : isGenerating ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
               <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #f1f5f9', borderTopColor: '#1e3a5f', animation: 'spin 0.8s linear infinite' }} />
               <p style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>AI resume yozmoqda...</p>
