@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { adminApi } from '@/lib/api';
+import { Plus, Image as ImageIcon, Pencil, Trash2, Power, ChevronDown, ArrowUp, ArrowDown, X, Folder, Upload, Save, AlertCircle } from 'lucide-react';
 
 interface FormField {
   key: string;
@@ -63,6 +64,7 @@ export default function AdminServicesPage() {
   const [iconPreview, setIconPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
 
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
@@ -151,7 +153,12 @@ export default function AdminServicesPage() {
   }
 
   async function handleSave() {
-    if (!form.title.trim()) { setError('Nomini kiriting'); return; }
+    if (!form.title.trim()) {
+      setError('Nomini kiriting');
+      titleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      titleRef.current?.focus();
+      return;
+    }
     setSaving(true); setError('');
     try {
       let iconName: string | undefined;
@@ -361,7 +368,12 @@ export default function AdminServicesPage() {
         </div>
 
         <div style={st.modalBody}>
-          {error && <div style={st.errorBox}>{error}</div>}
+          {error && (
+            <div style={{ ...st.errorBox, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <AlertCircle size={16} strokeWidth={2} />
+              <span>{error}</span>
+            </div>
+          )}
 
           {modal === 'category' && (
             <div>
@@ -370,21 +382,34 @@ export default function AdminServicesPage() {
                 <div style={st.iconThumb}>
                   {iconPreview
                     ? <img src={iconPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    : <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M6 21l5-5 3 3 4-6 3 4"/></svg>}
+                    : <ImageIcon size={22} color="#94a3b8" strokeWidth={1.5} />}
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>Rasm tanlash</p>
                   <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>PNG, JPG yoki SVG</p>
                 </div>
+                <Upload size={16} color="#94a3b8" strokeWidth={1.8} />
                 <input ref={fileRef} type="file" accept="image/*" onChange={onIconChange} style={{ display: 'none' }} />
               </div>
             </div>
           )}
 
           <div>
-            <label style={st.label}>{modal === 'category' ? 'Kategoriya nomi' : "Yo'nalish nomi"}</label>
-            <input style={st.input} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-              placeholder={modal === 'category' ? "Masalan: Resume yozish" : "Masalan: Dasturchi resume"} />
+            <label style={st.label}>
+              {modal === 'category' ? 'Kategoriya nomi' : "Yo'nalish nomi"}
+              <span style={{ color: '#ef4444', marginLeft: 4 }}>*</span>
+            </label>
+            <input
+              ref={titleRef}
+              style={{
+                ...st.input,
+                borderColor: error && !form.title.trim() ? '#ef4444' : '#e2e8f0',
+              }}
+              value={form.title}
+              onChange={e => { setForm({ ...form, title: e.target.value }); if (error) setError(''); }}
+              placeholder={modal === 'category' ? "Masalan: Resume yozish" : "Masalan: Dasturchi resume"}
+              autoFocus
+            />
           </div>
 
           <div>
@@ -416,11 +441,15 @@ export default function AdminServicesPage() {
                     (foydalanuvchi to&apos;ldiradi)
                   </span>
                 </label>
-                <button onClick={addField} style={{
+                <button type="button" onClick={addField} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
                   padding: '5px 12px', fontSize: 12, fontWeight: 600, color: '#3b82f6',
                   background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: 8,
                   cursor: 'pointer',
-                }}>+ Maydon</button>
+                }}>
+                  <Plus size={12} strokeWidth={2.5} />
+                  Maydon
+                </button>
               </div>
 
               {formFields.length === 0 && (
@@ -454,9 +483,15 @@ export default function AdminServicesPage() {
                           onChange={e => updateField(idx, { required: e.target.checked })} />
                         Majburiy
                       </label>
-                      <button onClick={() => moveField(idx, -1)} style={{ width: 24, height: 24, border: '1px solid #e2e8f0', borderRadius: 6, background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#94a3b8' }}>▲</button>
-                      <button onClick={() => moveField(idx, 1)} style={{ width: 24, height: 24, border: '1px solid #e2e8f0', borderRadius: 6, background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#94a3b8' }}>▼</button>
-                      <button onClick={() => removeField(idx)} style={{ width: 24, height: 24, border: '1px solid #fecaca', borderRadius: 6, background: '#fef2f2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#ef4444' }}>✕</button>
+                      <button type="button" title="Yuqoriga" onClick={() => moveField(idx, -1)} style={{ width: 24, height: 24, border: '1px solid #e2e8f0', borderRadius: 6, background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                        <ArrowUp size={11} strokeWidth={2.2} />
+                      </button>
+                      <button type="button" title="Pastga" onClick={() => moveField(idx, 1)} style={{ width: 24, height: 24, border: '1px solid #e2e8f0', borderRadius: 6, background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                        <ArrowDown size={11} strokeWidth={2.2} />
+                      </button>
+                      <button type="button" title="O'chirish" onClick={() => removeField(idx)} style={{ width: 24, height: 24, border: '1px solid #fecaca', borderRadius: 6, background: '#fef2f2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+                        <X size={11} strokeWidth={2.2} />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -466,8 +501,17 @@ export default function AdminServicesPage() {
         </div>
 
         <div style={st.modalFooter}>
-          <button style={st.cancelBtn} onClick={closeModal}>Bekor qilish</button>
-          <button style={st.saveBtn(saving || !form.title.trim())} onClick={handleSave} disabled={saving || !form.title.trim()}>
+          <button type="button" style={st.cancelBtn} onClick={closeModal}>
+            <X size={14} strokeWidth={2.2} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+            Bekor qilish
+          </button>
+          <button
+            type="button"
+            style={st.saveBtn(saving)}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            <Save size={14} strokeWidth={2.2} style={{ marginRight: 6, verticalAlign: 'middle' }} />
             {saving ? 'Saqlanmoqda...' : (editId ? 'Saqlash' : 'Yaratish')}
           </button>
         </div>
@@ -487,8 +531,8 @@ export default function AdminServicesPage() {
             {categories.length} kategoriya · {categories.reduce((a, c) => a + (c.children?.length || 0), 0)} yo&apos;nalish
           </p>
         </div>
-        <button style={st.addBtn} onClick={openCreateCategory}>
-          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" d="M12 5v14M5 12h14"/></svg>
+        <button type="button" style={st.addBtn} onClick={openCreateCategory}>
+          <Plus size={15} strokeWidth={2.5} />
           Kategoriya
         </button>
       </div>
@@ -496,11 +540,14 @@ export default function AdminServicesPage() {
       {categories.length === 0 ? (
         <div style={st.emptyState}>
           <div style={{ width: 64, height: 64, borderRadius: 20, background: '#f8fafc', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#cbd5e1" strokeWidth="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+            <Folder size={28} color="#cbd5e1" strokeWidth={1.5} />
           </div>
           <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>Hali kategoriya yo&apos;q</h3>
           <p style={{ color: '#94a3b8', fontSize: 13, marginBottom: 20 }}>Birinchi kategoriyangizni yarating</p>
-          <button style={st.addBtn} onClick={openCreateCategory}>+ Yangi kategoriya</button>
+          <button type="button" style={st.addBtn} onClick={openCreateCategory}>
+            <Plus size={14} strokeWidth={2.5} />
+            Yangi kategoriya
+          </button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -513,7 +560,7 @@ export default function AdminServicesPage() {
                   <div style={st.iconBox}>
                     {cat.icon
                       ? <img src={iconUrl(cat.icon)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                      : <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" strokeWidth="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>}
+                      : <Folder size={20} color="#94a3b8" strokeWidth={1.5} />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -524,24 +571,20 @@ export default function AdminServicesPage() {
                     {cat.description && <p style={st.desc}>{cat.description}</p>}
                   </div>
                   <div style={{ display: 'flex', gap: 4, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
-                    <button style={st.actionBtn('#3b82f6')} onClick={() => openCreateChild(cat.id)} title="Yo'nalish qo'shish">
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" d="M12 5v14M5 12h14"/></svg>
+                    <button type="button" style={st.actionBtn('#3b82f6')} onClick={() => openCreateChild(cat.id)} title="Yo'nalish qo'shish">
+                      <Plus size={14} strokeWidth={2.5} />
                     </button>
-                    <button style={st.actionBtn()} onClick={() => handleToggle(cat.id, cat.isActive)}>
-                      {cat.isActive
-                        ? <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#ef4444" strokeWidth="2"><circle cx="12" cy="12" r="4"/></svg>
-                        : <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#22c55e" strokeWidth="2"><circle cx="12" cy="12" r="4"/></svg>}
+                    <button type="button" style={st.actionBtn()} onClick={() => handleToggle(cat.id, cat.isActive)} title={cat.isActive ? 'Nofaol qilish' : 'Faol qilish'}>
+                      <Power size={13} color={cat.isActive ? '#ef4444' : '#22c55e'} strokeWidth={2} />
                     </button>
-                    <button style={st.actionBtn()} onClick={() => openEditCategory(cat)}>
-                      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <button type="button" style={st.actionBtn()} onClick={() => openEditCategory(cat)} title="Tahrirlash">
+                      <Pencil size={13} strokeWidth={2} />
                     </button>
-                    <button style={st.actionBtn('#ef4444')} onClick={() => handleDelete(cat.id, true)}>
-                      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
+                    <button type="button" style={st.actionBtn('#ef4444')} onClick={() => handleDelete(cat.id, true)} title="O'chirish">
+                      <Trash2 size={13} strokeWidth={2} />
                     </button>
                   </div>
-                  <svg style={st.chevron(isOpen)} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
-                  </svg>
+                  <ChevronDown size={20} strokeWidth={2} style={st.chevron(isOpen)} />
                 </div>
 
                 {isOpen && (
@@ -549,7 +592,10 @@ export default function AdminServicesPage() {
                     {children.length === 0 ? (
                       <div style={{ padding: '28px 24px', textAlign: 'center' }}>
                         <p style={{ color: '#94a3b8', fontSize: 13, marginBottom: 10 }}>Bu kategoriyada hali yo&apos;nalish yo&apos;q</p>
-                        <button style={{ ...st.cancelBtn, fontSize: 12.5, padding: '7px 16px' }} onClick={() => openCreateChild(cat.id)}>+ Yo&apos;nalish qo&apos;shish</button>
+                        <button type="button" style={{ ...st.cancelBtn, fontSize: 12.5, padding: '7px 16px', display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => openCreateChild(cat.id)}>
+                          <Plus size={12} strokeWidth={2.2} />
+                          Yo&apos;nalish qo&apos;shish
+                        </button>
                       </div>
                     ) : (
                       children.map((ch, idx) => (
@@ -566,16 +612,14 @@ export default function AdminServicesPage() {
                             {ch.description && <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{ch.description}</p>}
                           </div>
                           <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                            <button style={{ ...st.actionBtn(), width: 28, height: 28 }} onClick={() => handleToggle(ch.id, ch.isActive)}>
-                              {ch.isActive
-                                ? <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#ef4444" strokeWidth="2"><circle cx="12" cy="12" r="4"/></svg>
-                                : <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#22c55e" strokeWidth="2"><circle cx="12" cy="12" r="4"/></svg>}
+                            <button type="button" style={{ ...st.actionBtn(), width: 28, height: 28 }} onClick={() => handleToggle(ch.id, ch.isActive)} title={ch.isActive ? 'Nofaol qilish' : 'Faol qilish'}>
+                              <Power size={11} color={ch.isActive ? '#ef4444' : '#22c55e'} strokeWidth={2} />
                             </button>
-                            <button style={{ ...st.actionBtn(), width: 28, height: 28 }} onClick={() => openEditChild(ch, cat.id)}>
-                              <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#64748b" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            <button type="button" style={{ ...st.actionBtn(), width: 28, height: 28 }} onClick={() => openEditChild(ch, cat.id)} title="Tahrirlash">
+                              <Pencil size={11} color="#64748b" strokeWidth={2} />
                             </button>
-                            <button style={{ ...st.actionBtn('#ef4444'), width: 28, height: 28 }} onClick={() => handleDelete(ch.id, false)}>
-                              <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
+                            <button type="button" style={{ ...st.actionBtn('#ef4444'), width: 28, height: 28 }} onClick={() => handleDelete(ch.id, false)} title="O'chirish">
+                              <Trash2 size={11} strokeWidth={2} />
                             </button>
                           </div>
                         </div>
@@ -583,8 +627,11 @@ export default function AdminServicesPage() {
                     )}
                     {children.length > 0 && (
                       <div style={{ padding: '12px 24px 12px 84px', borderTop: '1px solid #f1f5f9' }}>
-                        <button style={{ background: 'none', border: 'none', fontSize: 12.5, fontWeight: 600, color: '#3b82f6', cursor: 'pointer', padding: '4px 0' }}
-                          onClick={() => openCreateChild(cat.id)}>+ Yo&apos;nalish qo&apos;shish</button>
+                        <button type="button" style={{ background: 'none', border: 'none', fontSize: 12.5, fontWeight: 600, color: '#3b82f6', cursor: 'pointer', padding: '4px 0', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                          onClick={() => openCreateChild(cat.id)}>
+                          <Plus size={12} strokeWidth={2.2} />
+                          Yo&apos;nalish qo&apos;shish
+                        </button>
                       </div>
                     )}
                   </div>
