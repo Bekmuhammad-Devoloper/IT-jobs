@@ -268,4 +268,20 @@ export class TelegramService {
     }
     return tags.join(' ');
   }
+
+  async sendPhotoToAdmins(photoUrl: string, caption: string): Promise<void> {
+    const adminIds = this.config.get<string>('ADMIN_IDS', '');
+    if (!adminIds) {
+      this.logger.warn('ADMIN_IDS not set, skipping sendPhotoToAdmins');
+      return;
+    }
+    const ids = adminIds.split(',').map((id) => id.trim()).filter(Boolean);
+    for (const id of ids) {
+      try {
+        await this.api.sendPhoto(id, photoUrl, { caption, parse_mode: 'HTML' });
+      } catch (error: any) {
+        this.logger.error(`Failed to send photo to admin ${id}: ${error.message}`);
+      }
+    }
+  }
 }
