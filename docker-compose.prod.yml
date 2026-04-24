@@ -64,7 +64,7 @@ services:
       - RATING_CALC_CRON=${RATING_CALC_CRON:-0 0 * * *}
       - CLEANUP_CRON=${CLEANUP_CRON:-0 0 * * 0}
       - POST_COOLDOWN_DAYS=${POST_COOLDOWN_DAYS:-15}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:?GEMINI_API_KEY is required}
       - GEMINI_API_KEY_2=${GEMINI_API_KEY_2:-}
     ports:
       - "10002:3002"
@@ -106,14 +106,10 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=http://backend:3002/api
-        - NEXT_PUBLIC_PAYMENT_CARD=${PAYMENT_CARD:-}
-        - NEXT_PUBLIC_PAYMENT_OWNER=${PAYMENT_OWNER:-}
     container_name: yuksalish_webapp
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://backend:3002/api
-      - NEXT_PUBLIC_PAYMENT_CARD=${PAYMENT_CARD:-}
-      - NEXT_PUBLIC_PAYMENT_OWNER=${PAYMENT_OWNER:-}
     ports:
       - "10000:3000"
     depends_on:

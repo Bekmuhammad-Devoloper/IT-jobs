@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import type { GeneratedResume, ResumeEntry } from '@/lib/api';
+import ResumeDocument from './ResumeDocument';
 
 const FONT_STACK = "'Tinos', 'Liberation Serif', 'Times New Roman', Times, serif";
 const FONT_CSS_URL =
@@ -183,47 +184,26 @@ export default function ResumePaper({ data }: { data: GeneratedResume }) {
   );
 }
 
-export async function downloadResumePdf(element: HTMLElement, fullName: string) {
-  // Aggressively ensure Tinos is fully loaded (link, preconnect injected by ResumePaper)
-  if (typeof document !== 'undefined' && document.fonts) {
-    try {
-      await Promise.all([
-        document.fonts.load('400 14px Tinos'),
-        document.fonts.load('700 14px Tinos'),
-        document.fonts.load('italic 400 14px Tinos'),
-        document.fonts.load('italic 700 14px Tinos'),
-      ]);
-      if (document.fonts.ready) await document.fonts.ready;
-    } catch {}
-  }
-
-  // Remove any CSS scaling from element & ancestors so html2canvas captures true A4 size
-  const touched: Array<{ el: HTMLElement; prev: string }> = [];
-  let node: HTMLElement | null = element;
-  while (node) {
-    const t = node.style.transform;
-    if (t) {
-      touched.push({ el: node, prev: t });
-      node.style.transform = 'none';
-    }
-    node = node.parentElement;
-  }
-
-  try {
-    const mod: any = await import('html2pdf.js');
-    const html2pdf = mod.default || mod;
-    await html2pdf()
-      .set({
-        margin: 0,
-        filename: `${(fullName || 'resume').replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, windowWidth: 794 },
-        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-      })
-      .from(element)
-      .save();
-  } finally {
-    for (const { el, prev } of touched) el.style.transform = prev;
-  }
+/**
+ * Download the resume as a pixel-perfect PDF using @react-pdf/renderer.
+ * This renders directly to PDF using standard Times-Roman — identical to
+ * what Microsoft Word produces for the reference template (no HTML-to-canvas
+ * conversion, no font fallback issues).
+ */
+export async function downloadResumePdf(
+  _element: HTMLElement | null,
+  fullName: string,
+  data?: GeneratedResume,
+) {
+  if (!data) throw new Error('Resume data required for PDF generation');
+  const { pdf } = await import('@react-pdf/renderer');
+  const blob = await pdf(<ResumeDocument data={data} />).toBlob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(fullName || 'resume').replace(/\s+/g, '_')}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

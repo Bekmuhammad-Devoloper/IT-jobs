@@ -255,7 +255,7 @@ export default function ServicesPage() {
     if (!resumePaperRef.current || !resumeResult) return;
     setDownloading(true);
     try {
-      await downloadResumePdf(resumePaperRef.current, resumeResult.fullName);
+      await downloadResumePdf(resumePaperRef.current, resumeResult.fullName, resumeResult);
     } catch (e: any) {
       alert('PDF yaratishda xatolik: ' + (e?.message || 'noma\'lum'));
     } finally {
@@ -533,9 +533,22 @@ export default function ServicesPage() {
                 style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 16, cursor: 'pointer' }}
               >
                 <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 24, overflow: 'hidden' }}>
-                  {cat.icon
-                    ? <img src={iconUrl(cat.icon)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--navy)" strokeWidth="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>}
+                  {cat.icon ? (
+                    <img
+                      src={iconUrl(cat.icon)}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={e => {
+                        const img = e.currentTarget;
+                        img.style.display = 'none';
+                        const fallback = img.nextElementSibling as HTMLElement | null;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <span style={{ display: cat.icon ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--navy)" strokeWidth="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  </span>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{ fontWeight: 700, fontSize: 15, color: 'var(--navy)', marginBottom: 2 }}>{cat.title}</h3>

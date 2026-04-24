@@ -46,37 +46,6 @@ export class TelegramService {
     }
   }
 
-  async sendPhotoToAdmins(photoUrl: string, caption: string): Promise<void> {
-    const ids = (this.config.get<string>('SUPER_ADMIN_IDS') || '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    for (const id of ids) {
-      try {
-        await this.api.sendPhoto(id, photoUrl, { caption, parse_mode: 'HTML' });
-      } catch (err: any) {
-        this.logger.warn(`Failed to send photo to admin ${id}: ${err?.message}`);
-        try {
-          await this.api.sendMessage(id, `${caption}\n\n📎 ${photoUrl}`, { parse_mode: 'HTML' });
-        } catch {}
-      }
-    }
-  }
-
-  async notifyAdmins(text: string): Promise<void> {
-    const ids = (this.config.get<string>('SUPER_ADMIN_IDS') || '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    for (const id of ids) {
-      try {
-        await this.api.sendMessage(id, text, { parse_mode: 'HTML' });
-      } catch (err: any) {
-        this.logger.warn(`Failed to notify admin ${id}: ${err?.message}`);
-      }
-    }
-  }
-
   async editChannelMessage(messageId: number, text: string, options?: any) {
     if (!this.channelId) return null;
     try {
