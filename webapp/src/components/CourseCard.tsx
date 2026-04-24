@@ -1,7 +1,7 @@
 'use client';
 import type { Post } from '@/types';
 import Link from 'next/link';
-import { Eye, Clock, Calendar, CalendarDays, DollarSign, Briefcase, GraduationCap } from 'lucide-react';
+import { Eye, Clock, Calendar, CalendarDays, Wallet, Briefcase, GraduationCap, Building2, Star } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 
 interface CourseCardProps {
@@ -175,11 +175,11 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
               background: 'linear-gradient(135deg, hsla(38, 92%, 88%, 1), hsla(38, 92%, 78%, 1))',
               color: 'hsl(28, 80%, 30%)',
               whiteSpace: 'nowrap',
-              display: 'inline-flex', alignItems: 'center', gap: 3,
+              display: 'inline-flex', alignItems: 'center', gap: 5,
               boxShadow: '0 2px 8px hsla(38, 80%, 60%, 0.2)',
               border: '1px solid hsla(38, 80%, 70%, 0.5)',
             }}>
-              <DollarSign size={m ? 12 : 14} strokeWidth={2.3} />
+              <Wallet size={m ? 13 : 15} strokeWidth={2} />
               <span>{salaryLabel}</span>
             </div>
             {post.experience && (
@@ -193,11 +193,13 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
             )}
             {post.company && (
               <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 3,
                 fontSize: m ? 10 : 11, fontWeight: 600, color: 'hsl(217, 91%, 45%)',
-                whiteSpace: 'nowrap', maxWidth: m ? 100 : 140,
+                whiteSpace: 'nowrap', maxWidth: m ? 110 : 150,
                 overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
-                🏫 {post.company}
+                <Building2 size={m ? 11 : 12} strokeWidth={2} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{post.company}</span>
               </span>
             )}
           </div>
@@ -243,19 +245,13 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {[1, 2, 3, 4, 5].map((i) => (
-              <svg
+              <Star
                 key={i}
-                width={m ? 12 : 14}
-                height={m ? 12 : 14}
-                viewBox="0 0 24 24"
-                fill={i <= Math.round(rating) ? '#f5b731' : 'none'}
+                size={m ? 12 : 14}
+                fill={i <= Math.round(rating) ? '#f5b731' : 'transparent'}
                 stroke={i <= Math.round(rating) ? '#f5b731' : '#d1d5db'}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
+                strokeWidth={1.8}
+              />
             ))}
             {rating > 0 && (
               <span style={{ fontSize: m ? 10 : 11, fontWeight: 700, color: 'hsl(215, 16%, 47%)', marginLeft: 2 }}>
@@ -268,8 +264,8 @@ export default function CourseCard({ post, index = 0 }: CourseCardProps) {
             <Eye size={m ? 12 : 14} strokeWidth={2} /> {views}
           </span>
 
-          <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: m ? 11 : 12, fontWeight: 700, color: 'hsl(28, 80%, 35%)' }}>
-            <DollarSign size={m ? 11 : 13} strokeWidth={2.2} /> {salaryLabel}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: m ? 11 : 12, fontWeight: 700, color: 'hsl(28, 80%, 35%)' }}>
+            <Wallet size={m ? 12 : 13} strokeWidth={2} /> {salaryLabel}
           </span>
 
           {author && (
