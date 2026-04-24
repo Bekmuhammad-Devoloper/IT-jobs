@@ -532,10 +532,10 @@ export default function AdminServicesPage() {
   );
 
   return (
-    <div className="fade-in-up" style={st.page}>
+    <>
       <style>{`@keyframes slideUp { from { opacity:0;transform:translateY(12px) } to { opacity:1;transform:translateY(0) } }`}</style>
       {modalContent}
-
+      <div className="fade-in-up" style={st.page}>
       <div style={st.header}>
         <div>
           <h2 style={st.headerTitle}>Xizmatlar</h2>
@@ -654,5 +654,6 @@ export default function AdminServicesPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
