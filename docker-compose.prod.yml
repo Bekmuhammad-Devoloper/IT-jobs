@@ -64,6 +64,8 @@ services:
       - RATING_CALC_CRON=${RATING_CALC_CRON:-0 0 * * *}
       - CLEANUP_CRON=${CLEANUP_CRON:-0 0 * * 0}
       - POST_COOLDOWN_DAYS=${POST_COOLDOWN_DAYS:-15}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_API_KEY_2=${GEMINI_API_KEY_2:-}
     ports:
       - "10002:3002"
     volumes:
