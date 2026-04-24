@@ -32,12 +32,11 @@ interface ServiceCategory {
   children: ServiceChild[];
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-
 function iconUrl(icon?: string) {
   if (!icon) return '';
   if (icon.startsWith('http') || icon.startsWith('/api/')) return icon;
-  return `${API_URL}/upload/${icon}`;
+  // Always use relative /api/... so the browser hits nginx, not the Docker-internal hostname.
+  return `/api/upload/${icon}`;
 }
 
 const FIELD_TYPES = [
