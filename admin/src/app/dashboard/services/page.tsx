@@ -285,22 +285,22 @@ export default function AdminServicesPage() {
     } as React.CSSProperties,
     overlay: {
       position: 'fixed' as const, inset: 0, background: 'rgba(15,23,42,0.45)',
-      backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex',
-      alignItems: 'center', justifyContent: 'center', padding: '16px',
+      backdropFilter: 'blur(6px)', zIndex: 1000,
       overflowY: 'auto' as const,
+      padding: '24px 16px',
     } as React.CSSProperties,
     modalBox: {
       background: '#fff', borderRadius: 20, padding: 0, maxWidth: 540,
       width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04)',
       overflow: 'hidden', animation: 'slideUp 0.22s cubic-bezier(0.22,1,0.36,1)',
-      maxHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column' as const,
-      margin: 'auto',
+      display: 'flex', flexDirection: 'column' as const,
+      margin: '0 auto',
     } as React.CSSProperties,
     modalHeader: {
       padding: '22px 24px 0', fontSize: 17, fontWeight: 700, color: '#0f172a',
       flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     } as React.CSSProperties,
-    modalBody: { padding: '16px 24px', display: 'flex', flexDirection: 'column' as const, gap: 16, overflowY: 'auto' as const, flex: 1 } as React.CSSProperties,
+    modalBody: { padding: '16px 24px', display: 'flex', flexDirection: 'column' as const, gap: 16, flex: 1 } as React.CSSProperties,
     modalFooter: {
       padding: '14px 24px 20px', display: 'flex', gap: 10,
       justifyContent: 'flex-end', flexShrink: 0, borderTop: '1px solid #f1f5f9',
