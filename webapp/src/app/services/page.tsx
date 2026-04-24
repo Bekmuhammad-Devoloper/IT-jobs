@@ -78,8 +78,8 @@ export default function ServicesPage() {
   const [copiedCard, setCopiedCard] = useState(false);
   const resumePaperRef = useRef<HTMLDivElement>(null);
 
-  const PAYMENT_CARD = process.env.NEXT_PUBLIC_PAYMENT_CARD || '9860 0101 2345 6789';
-  const PAYMENT_OWNER = process.env.NEXT_PUBLIC_PAYMENT_OWNER || 'BEKMUHAMMAD XAMIDOV';
+  const PAYMENT_CARD = process.env.NEXT_PUBLIC_PAYMENT_CARD || '9860 1606 0805 5424';
+  const PAYMENT_OWNER = process.env.NEXT_PUBLIC_PAYMENT_OWNER || 'SHAKIRJONOV BEKMUHAMMAD';
 
   useEffect(() => {
     api.services.getAll()
@@ -233,7 +233,7 @@ export default function ServicesPage() {
   async function sendToTelegram() {
     if (!resumeResult) return;
     setSending(true);
-    const support = (process.env.NEXT_PUBLIC_SUPPORT_TG || 'itjobs_support').replace('@', '');
+    const support = (process.env.NEXT_PUBLIC_SUPPORT_TG || 'Khamidov_online').replace('@', '');
     const supportUrl = `https://t.me/${support}`;
     try {
       const msg = [
@@ -593,7 +593,7 @@ export default function ServicesPage() {
           <div style={{ position: 'relative', zIndex: 2 }}>
             <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Maxsus xizmat kerakmi?</p>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 20 }}>Biz bilan bog&apos;laning</p>
-            <a href={`https://t.me/${(process.env.NEXT_PUBLIC_CONTACT_TG || 'Khamidov_onine').replace('@','')}`} target="_blank" rel="noopener noreferrer"
+            <a href={`https://t.me/${(process.env.NEXT_PUBLIC_CONTACT_TG || 'Khamidov_online').replace('@','')}`} target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', borderRadius: 10, background: 'var(--gold)', color: '#fff', fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 4px 12px rgba(184,160,106,0.3)' }}>
               <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 5L2 12.5l7 1M21 5l-4 15-7-8.5M21 5l-12 8.5" /></svg>
               Telegram orqali yozish

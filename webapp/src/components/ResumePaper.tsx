@@ -1,10 +1,52 @@
 'use client';
+import { useEffect } from 'react';
 import type { GeneratedResume, ResumeEntry } from '@/lib/api';
 
 const FONT_STACK = "'Tinos', 'Liberation Serif', 'Times New Roman', Times, serif";
+const FONT_CSS_URL =
+  'https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap';
+
+function useEnsureTinos() {
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const id = 'tinos-font-link';
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = FONT_CSS_URL;
+      document.head.appendChild(link);
+    }
+    const pre = 'tinos-font-preconnect';
+    if (!document.getElementById(pre)) {
+      const p = document.createElement('link');
+      p.id = pre;
+      p.rel = 'preconnect';
+      p.href = 'https://fonts.gstatic.com';
+      p.crossOrigin = 'anonymous';
+      document.head.appendChild(p);
+    }
+    if (document.fonts?.load) {
+      Promise.allSettled([
+        document.fonts.load('400 14px Tinos'),
+        document.fonts.load('700 14px Tinos'),
+        document.fonts.load('italic 400 14px Tinos'),
+        document.fonts.load('italic 700 14px Tinos'),
+      ]).catch(() => {});
+    }
+  }, []);
+}
 
 export default function ResumePaper({ data }: { data: GeneratedResume }) {
+  useEnsureTinos();
   const { template, fullName, contact, education, experience, leadership, skills, interests } = data;
+
+  const Bullet = ({ children }: { children: React.ReactNode }) => (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, margin: '2.5px 0' }}>
+      <span style={{ flexShrink: 0, fontSize: 13, lineHeight: 1.45, color: '#000', marginTop: 0 }}>●</span>
+      <span style={{ flex: 1, fontSize: 12.5, lineHeight: 1.5, textAlign: 'justify' }}>{children}</span>
+    </div>
+  );
 
   const Entry = ({ e }: { e: ResumeEntry }) => (
     <div style={{ marginBottom: 10 }}>
@@ -17,18 +59,18 @@ export default function ResumePaper({ data }: { data: GeneratedResume }) {
         <span style={{ fontStyle: 'italic', fontSize: 12.5 }}>{e.subRight}</span>
       </div>
       {e.bullets.length > 0 && (
-        <ul style={{ margin: '4px 0 0 0', paddingLeft: 22, fontSize: 12, lineHeight: 1.45, listStyleType: 'disc' }}>
+        <div style={{ marginTop: 4, paddingLeft: 8 }}>
           {e.bullets.map((b, i) => (
-            <li key={i} style={{ margin: '2px 0', textAlign: 'justify' }}>{b}</li>
+            <Bullet key={i}>{b}</Bullet>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
 
   const Heading = ({ children }: { children: string }) => (
     <h2 style={{
-      fontSize: 12.5, fontWeight: 700, textTransform: 'uppercase',
+      fontSize: 13, fontWeight: 700, textTransform: 'uppercase',
       letterSpacing: '0.02em', borderBottom: '1.4px solid #000',
       paddingBottom: 2, margin: '14px 0 7px', lineHeight: 1.2,
     }}>
@@ -58,12 +100,12 @@ export default function ResumePaper({ data }: { data: GeneratedResume }) {
     <>
       <Heading>Qiziqishlaringiz / Ko&apos;nikmalaringiz</Heading>
       {skills && (
-        <p style={{ fontSize: 12, margin: '5px 0', lineHeight: 1.45, textAlign: 'justify' }}>
+        <p style={{ fontSize: 12.5, margin: '5px 0', lineHeight: 1.5, textAlign: 'justify' }}>
           <strong>Ko&apos;nikmalar:</strong> {skills}
         </p>
       )}
       {interests && (
-        <p style={{ fontSize: 12, margin: '5px 0', lineHeight: 1.45, textAlign: 'justify' }}>
+        <p style={{ fontSize: 12.5, margin: '5px 0', lineHeight: 1.5, textAlign: 'justify' }}>
           <strong>Qiziqishlar:</strong> {interests}
         </p>
       )}
@@ -72,12 +114,10 @@ export default function ResumePaper({ data }: { data: GeneratedResume }) {
 
   return (
     <>
-      {/* Import Tinos (Times-compatible open font) so rendering matches across devices and in html2pdf canvas */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
         .resume-paper-root, .resume-paper-root * {
           font-family: ${FONT_STACK};
-          font-feature-settings: "kern" 1;
+          font-feature-settings: "kern" 1, "liga" 1;
           -webkit-font-smoothing: antialiased;
         }
         @media (max-width: 820px) {
@@ -109,14 +149,14 @@ export default function ResumePaper({ data }: { data: GeneratedResume }) {
         }}
       >
         <h1 style={{
-          textAlign: 'center', fontSize: 24, fontWeight: 700, margin: 0,
+          textAlign: 'center', fontSize: 26, fontWeight: 700, margin: 0,
           letterSpacing: '0.005em', lineHeight: 1.15,
         }}>
           {fullName}
         </h1>
         {contact && (
           <p style={{
-            textAlign: 'center', fontSize: 12, margin: '5px 0 14px',
+            textAlign: 'center', fontSize: 12.5, margin: '6px 0 14px',
             color: '#000', lineHeight: 1.3,
           }}>
             {contact}
@@ -144,14 +184,20 @@ export default function ResumePaper({ data }: { data: GeneratedResume }) {
 }
 
 export async function downloadResumePdf(element: HTMLElement, fullName: string) {
-  // Ensure Google Font (Tinos) is fully loaded before html2canvas captures the element.
-  // Without this, the canvas can fall back to a different serif and the output looks wrong.
-  if (typeof document !== 'undefined' && document.fonts?.ready) {
-    try { await document.fonts.ready; } catch {}
+  // Aggressively ensure Tinos is fully loaded (link, preconnect injected by ResumePaper)
+  if (typeof document !== 'undefined' && document.fonts) {
+    try {
+      await Promise.all([
+        document.fonts.load('400 14px Tinos'),
+        document.fonts.load('700 14px Tinos'),
+        document.fonts.load('italic 400 14px Tinos'),
+        document.fonts.load('italic 700 14px Tinos'),
+      ]);
+      if (document.fonts.ready) await document.fonts.ready;
+    } catch {}
   }
 
-  // Temporarily remove any CSS scaling from the element & ancestors so html2canvas
-  // captures the true A4 dimensions. We save and restore transforms.
+  // Remove any CSS scaling from element & ancestors so html2canvas captures true A4 size
   const touched: Array<{ el: HTMLElement; prev: string }> = [];
   let node: HTMLElement | null = element;
   while (node) {
