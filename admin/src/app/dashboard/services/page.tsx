@@ -284,23 +284,25 @@ export default function AdminServicesPage() {
       background: '#eff6ff', color: '#3b82f6',
     } as React.CSSProperties,
     overlay: {
-      position: 'fixed' as const, inset: 0, background: 'rgba(15,23,42,0.4)',
-      backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex',
-      alignItems: 'center', justifyContent: 'center', padding: 24,
+      position: 'fixed' as const, inset: 0, background: 'rgba(15,23,42,0.45)',
+      backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex',
+      alignItems: 'center', justifyContent: 'center', padding: '16px',
+      overflowY: 'auto' as const,
     } as React.CSSProperties,
     modalBox: {
-      background: '#fff', borderRadius: 20, padding: 0, maxWidth: 560,
-      width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.15)',
-      overflow: 'hidden', animation: 'slideUp 0.25s ease',
-      maxHeight: '90vh', display: 'flex', flexDirection: 'column' as const,
+      background: '#fff', borderRadius: 20, padding: 0, maxWidth: 540,
+      width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04)',
+      overflow: 'hidden', animation: 'slideUp 0.22s cubic-bezier(0.22,1,0.36,1)',
+      maxHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column' as const,
+      margin: 'auto',
     } as React.CSSProperties,
     modalHeader: {
-      padding: '24px 28px 0', fontSize: 18, fontWeight: 700, color: '#0f172a',
-      flexShrink: 0,
+      padding: '22px 24px 0', fontSize: 17, fontWeight: 700, color: '#0f172a',
+      flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     } as React.CSSProperties,
-    modalBody: { padding: '20px 28px', display: 'flex', flexDirection: 'column' as const, gap: 18, overflowY: 'auto' as const, flex: 1 } as React.CSSProperties,
+    modalBody: { padding: '16px 24px', display: 'flex', flexDirection: 'column' as const, gap: 16, overflowY: 'auto' as const, flex: 1 } as React.CSSProperties,
     modalFooter: {
-      padding: '16px 28px 24px', display: 'flex', gap: 10,
+      padding: '14px 24px 20px', display: 'flex', gap: 10,
       justifyContent: 'flex-end', flexShrink: 0, borderTop: '1px solid #f1f5f9',
     } as React.CSSProperties,
     label: { fontSize: 12.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase' as const, letterSpacing: '0.04em' } as React.CSSProperties,
@@ -362,9 +364,19 @@ export default function AdminServicesPage() {
     <div style={st.overlay} onClick={closeModal}>
       <div style={st.modalBox} onClick={e => e.stopPropagation()}>
         <div style={st.modalHeader}>
-          {modal === 'category'
-            ? (editId ? 'Kategoriyani tahrirlash' : 'Yangi kategoriya')
-            : (editId ? "Yo'nalishni tahrirlash" : "Yangi yo'nalish")}
+          <span>
+            {modal === 'category'
+              ? (editId ? 'Kategoriyani tahrirlash' : 'Yangi kategoriya')
+              : (editId ? "Yo'nalishni tahrirlash" : "Yangi yo'nalish")}
+          </span>
+          <button type="button" onClick={closeModal} style={{
+            width: 32, height: 32, borderRadius: '50%', border: 'none',
+            background: '#f1f5f9', cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            color: '#64748b', flexShrink: 0,
+          }}>
+            <X size={16} strokeWidth={2.2} />
+          </button>
         </div>
 
         <div style={st.modalBody}>
