@@ -17,6 +17,20 @@ export async function checkSubscription(ctx: Context): Promise<boolean> {
 }
 
 export async function subscriptionGuard(ctx: Context, next: NextFunction) {
+  // Skip non-user updates (channel posts, edited channel posts, etc.) — the bot
+  // shouldn't reply to its own channel with an "obuna bo'ling" prompt when admins
+  // publish posts manually.
+  const chatType = ctx.chat?.type;
+  if (chatType === 'channel' || chatType === 'supergroup' || chatType === 'group') {
+    return next();
+  }
+  if (ctx.channelPost || ctx.editedChannelPost) {
+    return next();
+  }
+  if (!ctx.from?.id) {
+    return next();
+  }
+
   // Allow check_subscription callback through
   if (ctx.callbackQuery?.data === 'check_subscription') {
     return next();
