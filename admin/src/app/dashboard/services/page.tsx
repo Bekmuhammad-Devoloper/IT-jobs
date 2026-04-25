@@ -242,8 +242,8 @@ export default function AdminServicesPage() {
       cursor: 'pointer', transition: 'background 0.15s',
     } as React.CSSProperties,
     iconBox: {
-      width: 48, height: 48, borderRadius: 12, background: '#f8fafc',
-      border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center',
+      width: 48, height: 48, borderRadius: 12, background: 'transparent',
+      display: 'flex', alignItems: 'center',
       justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
     } as React.CSSProperties,
     catTitle: { fontWeight: 600, fontSize: 15, color: '#0f172a' } as React.CSSProperties,
@@ -568,9 +568,9 @@ export default function AdminServicesPage() {
             return (
               <div key={cat.id} style={{ ...st.card, opacity: cat.isActive ? 1 : 0.55 }}>
                 <div style={st.cardRow} onClick={() => toggleExpand(cat.id)}>
-                  <div style={st.iconBox}>
+                  <div style={{ ...st.iconBox, background: cat.icon ? 'transparent' : '#f8fafc', border: cat.icon ? 'none' : '1px solid #f1f5f9' }}>
                     {cat.icon
-                      ? <img src={iconUrl(cat.icon)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      ? <img src={iconUrl(cat.icon)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12, display: 'block' }} />
                       : <Folder size={20} color="#94a3b8" strokeWidth={1.5} />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
