@@ -547,12 +547,12 @@ export default function ServicesPage() {
                 onClick={() => setOpenCat(isOpen ? null : cat.id)}
                 style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 16, cursor: 'pointer' }}
               >
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 24, overflow: 'hidden' }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: '#fff', border: '1.5px solid var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 24, overflow: 'hidden', boxShadow: '0 2px 8px rgba(30,58,95,0.08)' }}>
                   {cat.icon ? (
                     <img
                       src={iconUrl(cat.icon)}
                       alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ width: '80%', height: '80%', objectFit: 'contain', display: 'block' }}
                       onError={e => {
                         const img = e.currentTarget;
                         img.style.display = 'none';
