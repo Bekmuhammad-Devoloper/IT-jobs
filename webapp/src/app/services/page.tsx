@@ -90,7 +90,23 @@ export default function ServicesPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  function isResumeCategory(cat: ServiceCategory) {
+    return /resume|rezyume/i.test(cat.title);
+  }
+
   function selectService(child: ServiceChild, cat: ServiceCategory) {
+    if (!isResumeCategory(cat)) {
+      const support = (process.env.NEXT_PUBLIC_SUPPORT_TG || 'Khamidov_online').replace('@', '');
+      const supportUrl = `https://t.me/${support}`;
+      const lines = [
+        `Salom! ${cat.title} → ${child.title} xizmatiga qiziqyapman.`,
+      ];
+      if (child.price) lines.push(`Narxi: ${formatPrice(child.price)}`);
+      lines.push('', "Batafsil ma'lumot bera olasizmi?");
+      const text = lines.join('\n');
+      window.open(`${supportUrl}?text=${encodeURIComponent(text)}`, '_blank');
+      return;
+    }
     setSelectedService(child);
     setSelectedCategory(cat);
     setStep(1);
