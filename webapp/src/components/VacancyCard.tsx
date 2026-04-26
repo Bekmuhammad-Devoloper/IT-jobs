@@ -121,9 +121,15 @@ export default function VacancyCard({ post, index = 0 }: VacancyCardProps) {
           marginBottom: m ? 10 : 12, width: 'fit-content',
         }}>
           <DollarSign size={m ? 14 : 16} strokeWidth={2} />{' '}
-          {post.salary && !isNaN(Number(post.salary)) && Number(post.salary) > 0
-            ? Number(post.salary).toLocaleString('ru-RU')
-            : 'Kelishiladi'}
+          {(() => {
+            const raw = (post.salary || '').toString().trim();
+            if (!raw) return 'Kelishiladi';
+            const num = Number(raw.replace(/\s/g, ''));
+            if (!isNaN(num) && num > 0 && /^[\d\s]+$/.test(raw)) {
+              return `${num.toLocaleString('ru-RU')} so'm`;
+            }
+            return raw;
+          })()}
         </div>
 
         {/* 5. SKILL TEGLAR */}
