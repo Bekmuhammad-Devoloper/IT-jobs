@@ -2,7 +2,7 @@
 import type { Post } from '@/types';
 import { timeAgo } from '@/lib/utils';
 import Link from 'next/link';
-import { Building2, MapPin, Eye, DollarSign } from 'lucide-react';
+import { Building2, MapPin, Eye } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 
 interface VacancyCardProps {
@@ -120,7 +120,6 @@ export default function VacancyCard({ post, index = 0 }: VacancyCardProps) {
           padding: m ? '6px 12px' : '8px 16px', borderRadius: m ? 12 : 16,
           marginBottom: m ? 10 : 12, width: 'fit-content',
         }}>
-          <DollarSign size={m ? 14 : 16} strokeWidth={2} />{' '}
           {(() => {
             const raw = (post.salary || '').toString().trim();
             if (!raw) return 'Kelishiladi';
