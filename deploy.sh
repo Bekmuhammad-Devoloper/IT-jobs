@@ -54,8 +54,39 @@ cd "$APP_DIR"
 
 # ── 4. Create .env for docker-compose ───────────────────────
 echo "[4/7] Creating .env..."
-cp _deploy_root.env .env
-echo ".env created from _deploy_root.env"
+cat > .env <<'EOF'
+# PostgreSQL
+POSTGRES_DB=yuksalish
+POSTGRES_USER=postgres
+DB_PASSWORD=Yuksalish2026Secure
+
+# Redis
+REDIS_PASSWORD=YuksalishRedis2026
+
+# JWT
+JWT_SECRET=YuksalishJWTProductionSecret2026
+JWT_EXPIRATION=7d
+
+# Telegram
+BOT_TOKEN=8342175601:AAHK5EX79frw8tKgqUBGkBqTGwRIY1u3OAg
+CHANNEL_ID=
+CHANNEL_USERNAME=@yuksalish_channel
+
+# Public URLs
+WEBAPP_URL=https://it-jobs.bekmuhammad.uz
+ADMIN_URL=https://it-jobs.bekmuhammad.uz/admin
+
+# Admin
+SUPER_ADMIN_IDS=123456789
+ADMIN_SECRET_KEY=YuksalishAdminProductionKey2026
+ADMIN_USERNAME=Yuksalish2026
+ADMIN_PASSWORD=20062601
+
+# Gemini AI
+GEMINI_API_KEY=AIzaSyCIljOkkDv3v-sgoY3MwUaTvRNy88BVl_U
+GEMINI_API_KEY_2=AIzaSyCHfS29T76z10RCAQTcrynd_k4V-lpTa88
+EOF
+echo ".env created"
 
 # ── 5. Build & start containers ─────────────────────────────
 echo "[5/7] Building and starting Docker containers..."
