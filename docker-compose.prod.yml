@@ -50,7 +50,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required}
       - JWT_EXPIRATION=${JWT_EXPIRATION:-7d}
       - BOT_TOKEN=${BOT_TOKEN:?BOT_TOKEN is required}
-      - CHANNEL_ID=${CHANNEL_ID:?CHANNEL_ID is required}
+      - CHANNEL_ID=${CHANNEL_ID:-}
       - CHANNEL_USERNAME=${CHANNEL_USERNAME:?CHANNEL_USERNAME is required}
       - PORT=3002
       - NODE_ENV=production
